@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-const MedicalRecordSchema = new mongoose.Schema({
+const medicalRecordSchema = new mongoose.Schema({
     patientId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     doctorId: { type: mongoose.Schema.Types.ObjectId, ref: "Doctor", required: true },
     appointmentId: { type: mongoose.Schema.Types.ObjectId, ref: "Appointment" },
@@ -9,5 +9,5 @@ const MedicalRecordSchema = new mongoose.Schema({
     medicalHistory: String,
     allergies: String,
   }, { timestamps: true });
-  const MedicalRecord = mongoose.model("MedicalRecord", MedicalRecordSchema);
-  export default MedicalRecord;
+  const medicalRecordModel = mongoose.models.MedicalRecord ||mongoose.model("MedicalRecord", medicalRecordSchema);
+  export default medicalRecordModel;

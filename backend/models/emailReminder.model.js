@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-const EmailReminderSchema = new mongoose.Schema({
+const emailReminderSchema = new mongoose.Schema({
     appointmentId: { type: mongoose.Schema.Types.ObjectId, ref: "Appointment", required: true },
     patientId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     doctorId: { type: mongoose.Schema.Types.ObjectId, ref: "Doctor", required: true },
@@ -7,5 +7,5 @@ const EmailReminderSchema = new mongoose.Schema({
     reminderSent: { type: Boolean, default: false },
     reminderTime: Date
   }, { timestamps: true });
-  const EmailReminder = mongoose.model("EmailReminder", EmailReminderSchema);
-  export default EmailReminder;
+  const emailReminderModel = mongoose.models.emailReminder ||mongoose.model("EmailReminder", emailReminderSchema);
+  export default emailReminderModel;

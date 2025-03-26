@@ -1,5 +1,5 @@
 import mongoose from "mongoose"
-const UserSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
     fullName: String,
     email: { type: String, unique: true, required: true },
     password: { type: String, required: true },
@@ -11,5 +11,5 @@ const UserSchema = new mongoose.Schema({
     profileImage: String,
     refreshToken: String,
   }, { timestamps: true });
-  const User = mongoose.model("User", UserSchema);
-export default User;
+  const userModel = mongoose.models.user|| mongoose.model("User", userSchema);
+export default userModel;
