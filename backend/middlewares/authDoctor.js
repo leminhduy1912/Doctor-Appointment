@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
 
+// doctor authentication middleware
 const authDoctor = async (req, res, next) => {
     const { dtoken } = req.headers
     if (!dtoken) {
@@ -7,7 +8,7 @@ const authDoctor = async (req, res, next) => {
     }
     try {
         const token_decode = jwt.verify(dtoken, process.env.JWT_SECRET)
-        req.body.docId = token_decode.id
+        req.body.doctorId = token_decode.id
         next()
     } catch (error) {
         console.log(error)
@@ -15,4 +16,4 @@ const authDoctor = async (req, res, next) => {
     }
 }
 
-export default authDoctor;
+export default authDoctor

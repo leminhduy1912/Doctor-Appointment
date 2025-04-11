@@ -1,8 +1,9 @@
 import jwt from 'jsonwebtoken'
-import appointmentModel from '../models/appointment.model'
-import doctorModel from '../models/doctor.model'
+import appointmentModel from '../models/appointment.model.js'
+import doctorModel from '../models/doctor.model.js'
 import validator from 'validator'
 import bcrypt from 'bcrypt'
+import { v2 as cloudinary } from "cloudinary";
 // API for admin login
 const loginAdmin = async (req, res) => {
     try {
@@ -50,7 +51,6 @@ const appointmentCancel = async (req, res) => {
         console.log(error)
         res.json({ success: false, message: error.message })
     }
-
 }
 
 // API to get all doctors list for admin panel
@@ -66,59 +66,85 @@ const allDoctors = async (req, res) => {
     }
 }
 
-const addDoctor = async(req,res)=>{
+const addDoctor = async (req, res) => {
     try {
-        const { name, email, password, specialization, degree, experience, about, fee, address } = req.body
-        const imageFile = req.file
-         // checking for all data to add doctor
-         if (!name || !email || !password || !specialization || !degree || !experience || !about || !fee || !address) {
-            return res.json({ success: false, message: "Missing Details" })
+        const {
+            image, name, email, password, speciality,
+            degree, experience, about, fees,
+            address, phoneNumber, schedule
+        } = req.body;
+
+        console.log("Adding doctor:", name);
+
+        // Kiểm tra thiếu trường
+        if (!name || !email || !password || !speciality || !degree || !experience || !about || !fees || !address || !phoneNumber) {
+            return res.status(400).json({ success: false, message: "Missing Details" });
         }
-        // validating email format
+
+        // Kiểm tra email
         if (!validator.isEmail(email)) {
-            return res.json({ success: false, message: "Please enter a valid email" })
+            return res.status(400).json({ success: false, message: "Please enter a valid email" });
         }
-// Kiểm tra xem email đã tồn tại chưa
-const existingUser = await doctorModel.findOne({ email });
-if (existingUser) {
-    return res.status(400).json({ success: false, message: "Email already in use" });
-}
 
-        // validating strong password
+        const existingUser = await doctorModel.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ success: false, message: "Email already in use" });
+        }
+
         if (password.length < 8) {
-            return res.json({ success: false, message: "Please enter a strong password" })
+            return res.status(400).json({ success: false, message: "Please enter a strong password" });
         }
-        // hashing user password
-        const salt = await bcrypt.genSalt(10); // the more no. round the more time it will take
-        const hashedPassword = await bcrypt.hash(password, salt)
-        // upload image to cloudinary
-        const imageUpload = await cloudinary.uploader.upload(imageFile.path, { resource_type: "image" })
-        const imageUrl = imageUpload.secure_url
 
-        const newDoctor = new Doctor({
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        // Upload image nếu là base64 hoặc file path
+        let imageUrl = '';
+        if (image) {
+            const uploadRes = await cloudinary.uploader.upload(image);
+            imageUrl = uploadRes.secure_url;
+        }
+
+        // Parse address nếu là chuỗi JSON
+        const formattedAddress = typeof address === 'string' ? JSON.parse(address) : address;
+
+        // Parse schedule nếu là chuỗi JSON
+        const formattedSchedule = typeof schedule === 'string' ? JSON.parse(schedule) : schedule;
+
+        // Tạo đối tượng bác sĩ mới
+        const newDoctor = new doctorModel({
             name,
             email,
+            phoneNumber,
             password: hashedPassword,
-            specialization,
+            speciality,
             degree,
             experience,
             about,
-            fee,
-            address: JSON.parse(address),
-            profileImage: imageUrl,
-            patients: [], 
-            createdAt: new Date(), 
-            updatedAt: new Date()  
+            fees,
+            address: formattedAddress,
+            schedule: formattedSchedule,
+            image: imageUrl,
+            patients: [],
+            createdAt: new Date(),
+            updatedAt: new Date()
         });
 
         await newDoctor.save();
-        res.status(201).json({ success: true, message: "Doctor added successfully", doctor: newDoctor });
+
+        return res.status(201).json({
+            success: true,
+            message: "Doctor added successfully",
+            doctor: newDoctor
+        });
 
     } catch (error) {
         console.error("Error adding doctor:", error);
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
-}
+};
+
+
 // API to get dashboard data for admin panel
 const adminDashboard = async (req, res) => {
     try {
