@@ -34,17 +34,52 @@ const loginDoctor = async (req, res) => {
 // API to get doctor appointments for doctor panel
 const appointmentsDoctor = async (req, res) => {
     try {
-
-        const { doctorId } = req.body
-        const appointments = await appointmentModel.find({ doctorId })
-
-        res.json({ success: true, appointments })
-
+      const { doctorId } = req.body;
+  
+      // Lấy danh sách các lịch hẹn theo docId (không phải doctorId)
+      const appointments = await appointmentModel.find({ docId: doctorId }).sort({ createdAt: -1 });
+  
+      // Tìm bác sĩ để lấy lịch làm việc chi tiết
+      const doctor = await doctorModel.findById(doctorId);
+  
+      if (!doctor) {
+        return res.status(404).json({ success: false, message: "Doctor not found" });
+      }
+  
+      const formattedAppointments = appointments.map((app) => {
+        // Tìm lịch cụ thể theo slotId nếu có
+        const slot = doctor.schedule.find(
+          (s) => s._id.toString() === app.slotId
+        );
+  
+        return {
+          _id: app._id,
+          userData: app.userData,
+          amount: app.amount,
+          slotId: app.slotId,
+          slotDate: slot?.date || app.slotDate,
+          slotTime: app.slotTime,
+          startTime: slot?.startTime,
+          endTime: slot?.endTime,
+          status: app.status,
+          createdAt: app.createdAt,
+          updatedAt: app.updatedAt
+        };
+      });
+  
+      return res.status(200).json({
+        success: true,
+        appointments: formattedAppointments
+      });
     } catch (error) {
-        console.log(error)
-        res.json({ success: false, message: error.message })
+      console.error('Error fetching doctor appointments:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Server error while getting doctor appointments.'
+      });
     }
-}
+  };
+  
 
 //cancelled appointment
 const appointmentCancel = async (req, res) => {
