@@ -38,7 +38,8 @@ const appointmentSchema = new mongoose.Schema({
   userData: {
     _id: mongoose.Schema.Types.ObjectId,
     name: String,
-    email: String
+    email: String,
+    image:String
   },
   docData: {
     _id: mongoose.Schema.Types.ObjectId,

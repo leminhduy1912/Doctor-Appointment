@@ -5,6 +5,7 @@ import userModel from "../models/user.model.js";
 import {v2 as cloudinary} from "cloudinary"
 import doctorModel from "../models/doctor.model.js";
 import appointmentModel from "../models/appointment.model.js";
+import { sendNotiBookingToDoctor } from "../config/mailer.js";
 // API to register user
 const registerUser = async (req, res) => {
 
@@ -164,7 +165,7 @@ const isUserExist = async (req, res) => {
       if (!doctor.available) {
         return res.json({ success: false, message: 'Doctor is not available' });
       }
-  console.log("doctor",doctor.schedule)
+
       // Tìm slot theo slotId trong schedule
       const slot = doctor.schedule.find(s => s._id.toString() == slotId);
       if (!slot) {
@@ -209,7 +210,7 @@ const isUserExist = async (req, res) => {
   
       const newAppointment = new appointmentModel(appointmentData);
       await newAppointment.save();
-  
+      await sendNotiBookingToDoctor(doctor.email,slot.date,slot.startTime,slot.endTime,doctor.name,user.name,user.image)
       res.json({ success: true, message: 'Appointment booked successfully' });
   
     } catch (error) {
@@ -218,72 +219,7 @@ const isUserExist = async (req, res) => {
     }
   };
   
-  // get appointments
 
-
-//   const getAllAppointments = async (req, res) => {
-//     try {
-//       const userId = req.body.userId;
-  
-
-  
-//       const appointments = await appointmentModel.find({ userId: userId });
-   
-  
-//       const formattedAppointments = [];
-  
-//       for (const appointment of appointments) {
-//         const doctor = await doctorModel.findById(appointment.docId);
-   
-  
-//         if (!doctor) continue;
-  
-//         let slotInfo = null;
-//         let slotDate = null;
-  
-//         // So sánh trực tiếp _id của mỗi lịch với appointment.slotId
-//         for (const daySchedule of doctor.schedule) {
-//             // console.log(daySchedule._id.toString()==appointment.slotId)
-//             console.log("appoimentId",appointment.slotId);
-            
-//           if (daySchedule._id.toString() == appointment.slotId) {
-//             console.log("doctor da tim thay lich hen");
-//             slotInfo = {
-//               startTime: daySchedule.startTime,
-//               endTime: daySchedule.endTime
-//             };
-//             slotDate = daySchedule.date;
-//             break;
-//           }
-//         }
-  
-//         if (slotInfo) {
-//           formattedAppointments.push({
-//             _id: appointment._id,
-//             doctorName: doctor.name,
-//             doctorSpecialty: doctor.specialty,
-//             slotDate,
-//             startTime: slotInfo.startTime,
-//             endTime: slotInfo.endTime,
-//             status: appointment.status || 'Booked',
-//             createdAt: appointment.createdAt,
-//           });
-//         }
-//       }
-  
-//       return res.status(200).json({
-//         success: true,
-//         appointments: formattedAppointments,
-//       });
-  
-//     } catch (error) {
-//       console.error('Error fetching appointments:', error);
-//       return res.status(500).json({
-//         success: false,
-//         message: 'Server error while getting appointments.',
-//       });
-//     }
-//   };
   
 const getAllAppointments = async (req, res) => {
     try {
