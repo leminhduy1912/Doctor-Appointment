@@ -2,6 +2,7 @@ import doctorModel from "../models/doctor.model.js"
 import bcrypt from 'bcrypt'
 import jwt from "jsonwebtoken";
 import appointmentModel from "../models/appointment.model.js";
+import { sendPaymentRequestToUser } from "../config/mailer.js";
 
 // API for doctor Login 
 const loginDoctor = async (req, res) => {
@@ -55,6 +56,7 @@ const appointmentsDoctor = async (req, res) => {
         return {
           _id: app._id,
           userData: app.userData,
+          docData:app.docData,
           amount: app.amount,
           slotId: app.slotId,
           slotDate: slot?.date || app.slotDate,
@@ -228,11 +230,74 @@ const doctorDashboard = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
+const updateSlotStatus = async (req, res) => {
+    try {
+      const { doctorId, slotId, newStatus, isConfirm } = req.body;
+  
+      if (!doctorId || !slotId || !newStatus) {
+        return res.status(400).json({ success: false, message: "Missing required fields" });
+      }
+  
+      // 1. Tìm doctor
+      const doctor = await doctorModel.findById(doctorId);
+      if (!doctor) {
+        return res.json({ success: false, message: "Doctor not found" });
+      }
+  
+      // 2. Tìm slot trong schedule theo slotId
+      const slot = doctor.schedule.id(slotId);
+      if (!slot) {
+        return res.json({ success: false, message: "Slot not found" });
+      }
+  
+      // 3. Cập nhật status cho slot
+      slot.status = newStatus;
+      await doctor.save();
+  
+      // 4. Cập nhật tất cả appointment có slotId tương ứng
+      const updateResult = await appointmentModel.updateMany(
+        { docId: doctorId, slotId },
+        { $set: { status: newStatus } }
+      );
+  
+      // 5. Nếu xác nhận -> tìm appointment cụ thể để lấy thông tin gửi email
+      if (isConfirm) {
+        const appointment = await appointmentModel.findOne({ docId: doctorId, slotId });
+  
+        if (appointment) {
+          const patientEmail = appointment.userData.email;
+          const appointmentDate = appointment.slotDate;
+          const appointmentTime = appointment.slotTime;
+          const docName = appointment.docData.name;
+          const patientName = appointment.userData.name;
+  
+  
+          await sendPaymentRequestToUser(patientEmail, appointmentDate, appointmentTime, docName, patientName);
+        }
+      }
+  
+      res.json({
+        success: true,
+        message: "Slot and appointment status updated successfully",
+        updatedAppointments: updateResult.modifiedCount,
+        slotStatus: newStatus
+      });
+  
+    } catch (error) {
+      console.error("Error updating slot status:", error);
+      res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+  };
+  
 
+  
+  
+  
+  
 
 export {
     loginDoctor,
-    
+    updateSlotStatus,
     appointmentsDoctor,
     appointmentCancel,
     getDoctorList,

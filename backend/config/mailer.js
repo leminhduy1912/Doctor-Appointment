@@ -323,16 +323,7 @@ text-decoration: none
 </html>
 `;
 
-// export async function sendEmail() {
-//   const transporter = nodemailer.createTransport({
-//     host: 'smtp.gmail.com',
-//     port: 465, 
-//     secure: true,
-//     auth: {
-//       user: 'minhduyle081003@gmail.com',
-//       pass: 'tegm tgaa mukq wnwe' 
-//     }
-//   });
+
 
 const otpEmailHtml=
 `
@@ -1233,5 +1224,251 @@ const info = await transporter.sendMail({
 
 console.log('receipt sent: %s', info.messageId)
 }
+
+
+export async function sendPaymentRequestToUser(to,date,time,docName,patientName) {
+  const htmlNotiPaymentToUser=`
+  <!--
+  * This email was built using Tabular.
+  * For more information, visit https://tabular.email
+  -->
+  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="en">
+  <head>
+  <title></title>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <!--[if !mso]>-->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <!--<![endif]-->
+  <meta name="x-apple-disable-message-reformatting" content="" />
+  <meta content="target-densitydpi=device-dpi" name="viewport" />
+  <meta content="true" name="HandheldFriendly" />
+  <meta content="width=device-width" name="viewport" />
+  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no" />
+  <style type="text/css">
+  table {
+  border-collapse: separate;
+  table-layout: fixed;
+  mso-table-lspace: 0pt;
+  mso-table-rspace: 0pt
+  }
+  table td {
+  border-collapse: collapse
+  }
+  .ExternalClass {
+  width: 100%
+  }
+  .ExternalClass,
+  .ExternalClass p,
+  .ExternalClass span,
+  .ExternalClass font,
+  .ExternalClass td,
+  .ExternalClass div {
+  line-height: 100%
+  }
+  body, a, li, p, h1, h2, h3 {
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  }
+  html {
+  -webkit-text-size-adjust: none !important
+  }
+  body, #innerTable {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale
+  }
+  #innerTable img+div {
+  display: none;
+  display: none !important
+  }
+  img {
+  Margin: 0;
+  padding: 0;
+  -ms-interpolation-mode: bicubic
+  }
+  h1, h2, h3, p, a {
+  line-height: inherit;
+  overflow-wrap: normal;
+  white-space: normal;
+  word-break: break-word
+  }
+  a {
+  text-decoration: none
+  }
+  h1, h2, h3, p {
+  min-width: 100%!important;
+  width: 100%!important;
+  max-width: 100%!important;
+  display: inline-block!important;
+  border: 0;
+  padding: 0;
+  margin: 0
+  }
+  a[x-apple-data-detectors] {
+  color: inherit !important;
+  text-decoration: none !important;
+  font-size: inherit !important;
+  font-family: inherit !important;
+  font-weight: inherit !important;
+  line-height: inherit !important
+  }
+  u + #body a {
+  color: inherit;
+  text-decoration: none;
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  }
+  a[href^="mailto"],
+  a[href^="tel"],
+  a[href^="sms"] {
+  color: inherit;
+  text-decoration: none
+  }
+  </style>
+  <style type="text/css">
+  @media (min-width: 481px) {
+  .hd { display: none!important }
+  }
+  </style>
+  <style type="text/css">
+  @media (max-width: 480px) {
+  .hm { display: none!important }
+  }
+  </style>
+  <style type="text/css">
+  @media (max-width: 480px) {
+  .t105,.t12,.t16,.t57,.t81,.t87,.t93,.t99{vertical-align:top!important}.t66{mso-line-height-alt:0px!important;line-height:0!important;display:none!important}.t67{padding-left:30px!important;padding-bottom:40px!important;padding-right:30px!important}.t26{padding-bottom:20px!important}.t25{line-height:28px!important;font-size:26px!important;letter-spacing:-1.04px!important}.t127{padding:40px 30px!important}.t110{padding-bottom:36px!important}.t106{text-align:center!important}.t101,.t103,.t77,.t79,.t83,.t85,.t89,.t91,.t95,.t97{display:revert!important}.t58,.t59{display:block!important}.t105,.t81,.t87,.t93,.t99{width:44px!important}.t17{text-align:right!important}.t16{width:80px!important}.t14{padding-bottom:50px!important}.t12{width:370px!important}.t58{text-align:left!important}.t57{display:inline-block!important;width:100%!important;max-width:800px!important}.t55{padding-left:0!important}
+  }
+  </style>
+  <!--[if !mso]>-->
+  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@500;700;800&amp;display=swap" rel="stylesheet" type="text/css" />
+  <!--<![endif]-->
+  <!--[if mso]>
+  <xml>
+  <o:OfficeDocumentSettings>
+  <o:AllowPNG/>
+  <o:PixelsPerInch>96</o:PixelsPerInch>
+  </o:OfficeDocumentSettings>
+  </xml>
+  <![endif]-->
+  </head>
+  <body id="body" class="t133" style="min-width:100%;Margin:0px;padding:0px;background-color:#242424;"><div class="t132" style="background-color:#242424;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td class="t131" style="font-size:0;line-height:0;mso-line-height-rule:exactly;background-color:#242424;" valign="top" align="center">
+  <!--[if mso]>
+  <v:background xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false">
+  <v:fill color="#242424"/>
+  </v:background>
+  <![endif]-->
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" align="center" id="innerTable"><tr><td><div class="t66" style="mso-line-height-rule:exactly;mso-line-height-alt:45px;line-height:45px;font-size:1px;display:block;">&nbsp;&nbsp;</div></td></tr><tr><td align="center">
+  <table class="t70" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="600" class="t69" style="background-color:#F8F8F8;width:600px;">
+  <table class="t68" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t67" style="padding:0 50px 60px 50px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100% !important;"><tr><td align="center">
+  <table class="t24" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t23" style="width:800px;">
+  <table class="t22" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t21"><div class="t20" style="width:100%;text-align:right;"><div class="t19" style="display:inline-block;"><table class="t18" role="presentation" cellpadding="0" cellspacing="0" align="right" valign="top">
+  <tr class="t17"><td></td><td class="t12" width="370" valign="top">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t11" style="width:100%;"><tr><td class="t10" style="padding:35px 0 0 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100% !important;"><tr><td align="center">
+  <table class="t4" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="370" class="t3" style="width:600px;">
+  <table class="t2" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t1"><p class="t0" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;">Booking notification</p></td></tr></table>
+  </td></tr></table>
+  </td></tr><tr><td align="center">
+  <table class="t9" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="370" class="t8" style="width:600px;">
+  <table class="t7" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t6" style="padding:0 0 22px 0;"><p class="t5" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;">Date: ${date}</p></td></tr></table>
+  </td></tr></table>
+  </td></tr></table></td></tr></table>
+  </td><td class="t16" width="130" valign="top">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t15" style="width:100%;"><tr><td class="t14" style="padding:0 0 60px 0;"><div style="font-size:0px;"><img class="t13" style="display:block;border:0;height:auto;width:100%;Margin:0;max-width:100%;" width="130" height="129.078125" alt="" src="https://8527de8c-2e2d-461a-8323-af2588c02fac.b-cdn.net/e/4ec395aa-4643-4b29-800d-7debde54016b/3c6945dc-6b0f-4a7f-86ce-23cb0fc42212.jpeg"/></div></td></tr></table>
+  </td>
+  <td></td></tr>
+  </table></div></div></td></tr></table>
+  </td></tr></table>
+  </td></tr><tr><td align="center">
+  <table class="t29" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t28" style="width:600px;">
+  <table class="t27" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t26" style="padding:0 0 15px 0;"><h1 class="t25" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:26px;font-weight:800;font-style:normal;font-size:24px;text-decoration:none;text-transform:none;letter-spacing:-1.56px;direction:ltr;color:#191919;text-align:left;mso-line-height-rule:exactly;mso-text-raise:1px;">Hello ${patientName},</h1></td></tr></table>
+  </td></tr></table>
+  </td></tr><tr><td align="center">
+  <table class="t39" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t38" style="width:600px;">
+  <table class="t37" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t36" style="padding:0 0 22px 0;"><p class="t35" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;">Your appointment with <span class="t30" style="margin:0;Margin:0;font-weight:700;mso-line-height-rule:exactly;">${docName}</span> has been confirmed. Kindly visit our website, navigate to the &quot;<span class="t31" style="margin:0;Margin:0;font-weight:700;mso-line-height-rule:exactly;">My Appointment</span>&quot; section, select your appointment scheduled for<span class="t32" style="margin:0;Margin:0;font-weight:700;mso-line-height-rule:exactly;"> ${date}</span> at <span class="t33" style="margin:0;Margin:0;font-weight:700;mso-line-height-rule:exactly;">${time}</span>, and choose the &quot;<span class="t34" style="margin:0;Margin:0;font-weight:700;mso-line-height-rule:exactly;">Pay Online</span>&quot; option to complete the payment at your earliest convenience. We eagerly await your response.</p></td></tr></table>
+  </td></tr></table>
+  </td></tr><tr><td align="center">
+  <table class="t65" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t64" style="background-color:#F0F0F0;width:600px;">
+  <table class="t63" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t62" style="padding:40px 40px 40px 40px;"><div class="t61" style="width:100%;text-align:left;"><div class="t60" style="display:inline-block;"><table class="t59" role="presentation" cellpadding="0" cellspacing="0" align="left" valign="top">
+  <tr class="t58"><td></td><td class="t57" width="420" valign="top">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t56" style="width:100%;"><tr><td class="t55" style="padding:0 0 0 5px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100% !important;"><tr><td align="center">
+  <table class="t54" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="414.99999999999994" class="t53" style="width:800px;">
+  <table class="t52" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t51"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100% !important;"><tr><td align="center">
+  <table class="t44" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="414.99999999999994" class="t43" style="width:600px;">
+  <table class="t42" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t41"><h1 class="t40" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:16px;font-weight:700;font-style:normal;font-size:14px;text-decoration:none;text-transform:uppercase;direction:ltr;color:#1A1A1A;text-align:left;mso-line-height-rule:exactly;mso-text-raise:1px;">PAYMENT METHOD</h1></td></tr></table>
+  </td></tr></table>
+  </td></tr><tr><td><div class="t45" style="mso-line-height-rule:exactly;mso-line-height-alt:10px;line-height:10px;font-size:1px;display:block;">&nbsp;&nbsp;</div></td></tr><tr><td align="center">
+  <table class="t50" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="414.99999999999994" class="t49" style="width:600px;">
+  <table class="t48" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t47"><p class="t46" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:12px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#242424;text-align:left;mso-line-height-rule:exactly;mso-text-raise:3px;">VNPAY</p></td></tr></table>
+  </td></tr></table>
+  </td></tr></table></td></tr></table>
+  </td></tr></table>
+  </td></tr></table></td></tr></table>
+  </td>
+  <td></td></tr>
+  </table></div></div></td></tr></table>
+  </td></tr></table>
+  </td></tr></table></td></tr></table>
+  </td></tr></table>
+  </td></tr><tr><td align="center">
+  <table class="t130" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="600" class="t129" style="background-color:#242424;width:600px;">
+  <table class="t128" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t127" style="padding:48px 50px 48px 50px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100% !important;"><tr><td align="center">
+  <table class="t75" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t74" style="width:600px;">
+  <table class="t73" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t72"><p class="t71" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:800;font-style:normal;font-size:18px;text-decoration:none;text-transform:none;letter-spacing:-0.9px;direction:ltr;color:#757575;text-align:center;mso-line-height-rule:exactly;mso-text-raise:1px;">Want updates through more platforms?</p></td></tr></table>
+  </td></tr></table>
+  </td></tr><tr><td align="center">
+  <table class="t113" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t112" style="width:800px;">
+  <table class="t111" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t110" style="padding:10px 0 44px 0;"><div class="t109" style="width:100%;text-align:center;"><div class="t108" style="display:inline-block;"><table class="t107" role="presentation" cellpadding="0" cellspacing="0" align="center" valign="top">
+  <tr class="t106"><td></td><td class="t81" width="44" valign="top">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t80" style="width:100%;"><tr><td class="t77" style="width:10px;" width="10"></td><td class="t78"><div style="font-size:0px;"><img class="t76" style="display:block;border:0;height:auto;width:100%;Margin:0;max-width:100%;" width="24" height="24" alt="" src="https://8527de8c-2e2d-461a-8323-af2588c02fac.b-cdn.net/e/4ec395aa-4643-4b29-800d-7debde54016b/238994e3-e63d-463c-8294-9c1e41be5864.png"/></div></td><td class="t79" style="width:10px;" width="10"></td></tr></table>
+  </td><td class="t87" width="44" valign="top">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t86" style="width:100%;"><tr><td class="t83" style="width:10px;" width="10"></td><td class="t84"><div style="font-size:0px;"><img class="t82" style="display:block;border:0;height:auto;width:100%;Margin:0;max-width:100%;" width="24" height="24" alt="" src="https://8527de8c-2e2d-461a-8323-af2588c02fac.b-cdn.net/e/4ec395aa-4643-4b29-800d-7debde54016b/f9284271-e6cd-429c-a733-642a62f1c710.png"/></div></td><td class="t85" style="width:10px;" width="10"></td></tr></table>
+  </td><td class="t93" width="44" valign="top">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t92" style="width:100%;"><tr><td class="t89" style="width:10px;" width="10"></td><td class="t90"><div style="font-size:0px;"><img class="t88" style="display:block;border:0;height:auto;width:100%;Margin:0;max-width:100%;" width="24" height="24" alt="" src="https://8527de8c-2e2d-461a-8323-af2588c02fac.b-cdn.net/e/4ec395aa-4643-4b29-800d-7debde54016b/e0e5b823-7c9f-4c51-bd3b-b1dbf1dffea0.png"/></div></td><td class="t91" style="width:10px;" width="10"></td></tr></table>
+  </td><td class="t99" width="44" valign="top">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t98" style="width:100%;"><tr><td class="t95" style="width:10px;" width="10"></td><td class="t96"><div style="font-size:0px;"><img class="t94" style="display:block;border:0;height:auto;width:100%;Margin:0;max-width:100%;" width="24" height="24" alt="" src="https://8527de8c-2e2d-461a-8323-af2588c02fac.b-cdn.net/e/4ec395aa-4643-4b29-800d-7debde54016b/646223c1-6bf9-4b68-a633-1c75c092c6a6.png"/></div></td><td class="t97" style="width:10px;" width="10"></td></tr></table>
+  </td><td class="t105" width="44" valign="top">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t104" style="width:100%;"><tr><td class="t101" style="width:10px;" width="10"></td><td class="t102"><div style="font-size:0px;"><img class="t100" style="display:block;border:0;height:auto;width:100%;Margin:0;max-width:100%;" width="24" height="24" alt="" src="https://8527de8c-2e2d-461a-8323-af2588c02fac.b-cdn.net/e/4ec395aa-4643-4b29-800d-7debde54016b/10955565-efe6-47c3-b8c8-a713635831fc.png"/></div></td><td class="t103" style="width:10px;" width="10"></td></tr></table>
+  </td>
+  <td></td></tr>
+  </table></div></div></td></tr></table>
+  </td></tr></table>
+  </td></tr><tr><td align="center">
+  <table class="t118" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t117" style="width:600px;">
+  <table class="t116" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t115"><p class="t114" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:12px;text-decoration:none;text-transform:none;direction:ltr;color:#888888;text-align:center;mso-line-height-rule:exactly;mso-text-raise:3px;">4019 Waterview Lane, Santa Fe, NM, New Mexico 87500</p></td></tr></table>
+  </td></tr></table>
+  </td></tr><tr><td align="center">
+  <table class="t126" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t125" style="width:600px;">
+  <table class="t124" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t123"><p class="t122" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:12px;text-decoration:none;text-transform:none;direction:ltr;color:#888888;text-align:center;mso-line-height-rule:exactly;mso-text-raise:3px;"><a class="t119" href="https://tabular.email" style="margin:0;Margin:0;font-weight:700;font-style:normal;text-decoration:none;direction:ltr;color:#888888;mso-line-height-rule:exactly;" target="_blank">Unsubscribe</a>&nbsp; •&nbsp; <a class="t120" href="https://tabular.email" style="margin:0;Margin:0;font-weight:700;font-style:normal;text-decoration:none;direction:ltr;color:#888888;mso-line-height-rule:exactly;" target="_blank">Privacy policy</a>&nbsp; •&nbsp; <a class="t121" href="https://tabular.email" style="margin:0;Margin:0;font-weight:700;font-style:normal;text-decoration:none;direction:ltr;color:#878787;mso-line-height-rule:exactly;" target="_blank">Contact us</a></p></td></tr></table>
+  </td></tr></table>
+  </td></tr></table></td></tr></table>
+  </td></tr></table>
+  </td></tr></table></td></tr></table></div><div class="gmail-fix" style="display: none; white-space: nowrap; font: 15px courier; line-height: 0;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</div></body>
+  </html>
+  `
+
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD 
+  }
+})
+
+const info = await transporter.sendMail({
+  from: `Healthcare Booking System `,
+  to, 
+  subject:'Appointment Confirmation and Payment Instructions',
+  html:htmlNotiPaymentToUser
+})
+
+console.log('receipt sent: %s', info.messageId)
+}
+
 
 
