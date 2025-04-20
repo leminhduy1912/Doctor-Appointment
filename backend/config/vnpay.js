@@ -5,6 +5,7 @@ export const vnpayUrl = new VNPay({
     tmnCode: 'SX42DU7P',
     secureSecret: 'PIW76OF6FXNU7YAUFA13235LP2BTFFOI',
     vnpayHost: 'https://sandbox.vnpayment.vn',
+    vnp_ReturnUrl:'http://localhost:5000',
     
     // Cấu hình tùy chọn
     testMode: true,                // Chế độ test

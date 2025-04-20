@@ -38,7 +38,7 @@ router.get('/refund', function (req, res, next) {
 router.post('/create_payment_url', function (req, res, next) {
     
     process.env.TZ = 'Asia/Ho_Chi_Minh';
-    
+    let slotId = req.body.slotId;
     let date = new Date();
     let createDate = moment(date).format('YYYYMMDDHHmmss');
     
@@ -51,7 +51,8 @@ router.post('/create_payment_url', function (req, res, next) {
     let tmnCode = config.get('vnp_TmnCode');
     let secretKey = config.get('vnp_HashSecret');
     let vnpUrl = config.get('vnp_Url');
-    let returnUrl = config.get('vnp_ReturnUrl');
+    // let returnUrl = config.get('vnp_ReturnUrl');
+    let returnUrl = `http://localhost:5173/thank-you?slotId=${slotId}`
     let orderId = moment(date).format('DDHHmmss');
     let amount = req.body.amount;
     let bankCode = req.body.bankCode;
@@ -86,7 +87,7 @@ router.post('/create_payment_url', function (req, res, next) {
     vnp_Params['vnp_SecureHash'] = signed;
     vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: false });
 
-    res.redirect(vnpUrl)
+    res.status(200).json({ url: vnpUrl });
 });
 
 router.get('/vnpay_return', function (req, res, next) {

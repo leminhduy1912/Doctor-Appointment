@@ -13,6 +13,7 @@ import Loading from './components/Loader'
 import MyProfile from './pages/MyProfile'
 import Appointment from './pages/Appointment'
 import MyAppointments from './pages/MyAppointment'
+import ThankYou from './pages/ThankYou'
 
 function App() {
 
@@ -31,6 +32,7 @@ function App() {
         <Route path='/my-profile' element={<MyProfile />}/>
         <Route path='/appointment/:docId' element={<Appointment />} />
         <Route path='/my-appointments' element={<MyAppointments />} />
+        <Route path='/thank-you' element={<ThankYou />} />
         {/* <Route path='/appointment/:docId' element={<Appointment />} />
         <Route path='/my-appointments' element={<MyAppointments />} />  
         <Route path='/verify' element={<Verify />} />  */}

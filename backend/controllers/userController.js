@@ -5,7 +5,7 @@ import userModel from "../models/user.model.js";
 import {v2 as cloudinary} from "cloudinary"
 import doctorModel from "../models/doctor.model.js";
 import appointmentModel from "../models/appointment.model.js";
-import { sendNotiBookingToDoctor } from "../config/mailer.js";
+import { sendNotiNewBookingToDoctor } from "../config/mailer.js";
 // API to register user
 const registerUser = async (req, res) => {
 
@@ -202,7 +202,7 @@ const isUserExist = async (req, res) => {
           speciality: doctor.speciality,
           image: doctor.image
         },
-        amount: doctor.fees,
+        amount: slot.fees,
         slotTime: `${slot.startTime} - ${slot.endTime}`,
         slotDate: slot.date,
         date: Date.now()
@@ -210,7 +210,7 @@ const isUserExist = async (req, res) => {
   
       const newAppointment = new appointmentModel(appointmentData);
       await newAppointment.save();
-      await sendNotiBookingToDoctor(doctor.email,slot.date,slot.startTime,slot.endTime,doctor.name,user.name,user.image)
+      await sendNotiNewBookingToDoctor(doctor.email,slot.date,slot.startTime,slot.endTime,doctor.name,user.name,user.image)
       res.json({ success: true, message: 'Appointment booked successfully' });
   
     } catch (error) {

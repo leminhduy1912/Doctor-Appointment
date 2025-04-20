@@ -1,11 +1,13 @@
 import mongoose from "mongoose";
+
 const paymentSchema = new mongoose.Schema({
-    appointmentId: { type: mongoose.Schema.Types.ObjectId, ref: "Appointment", required: true },
-    patientId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    doctorId: { type: mongoose.Schema.Types.ObjectId, ref: "Doctor", required: true },
-    amount: Number,
-    paymentMethod: { type: String, enum: ["credit_card", "momo", "bank_transfer"] },
-    status: { type: String, enum: ["pending", "completed", "failed"], default: "pending" }
-  }, { timestamps: true });
-  const paymentModel = mongoose.models.payment||mongoose.model("Payment", paymentSchema);
-  export default paymentModel;
+  slotId: { type: mongoose.Schema.Types.ObjectId, ref: "Slot", required: true }, // 👈 Thêm slotId
+  amount: Number,
+  paymentMethod: { type: String, default: "VNPAY" },
+  status: { type: String, default: "completed" },
+  date: { type: Date, default: Date.now },
+  invoiceNumber: { type: String, required: true, unique: true } // 👈 Thêm số hóa đơn
+}, { timestamps: true });
+
+const paymentModel = mongoose.models.payment || mongoose.model("Payment", paymentSchema);
+export default paymentModel;

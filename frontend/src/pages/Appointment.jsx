@@ -1,207 +1,3 @@
-// import Loading from '../components/Loader';
-// import React, { useContext, useEffect, useState } from 'react';
-// import { useNavigate, useParams } from 'react-router-dom';
-// import { AppContext } from '../context/AppContext';
-// import { assets } from '../assets/assets';
-// import axios from 'axios';
-// import { toast } from 'react-toastify';
-
-// const Appointment = () => {
-//   const { docId } = useParams();
-//   const { doctors, currencySymbol, backendUrl, token, getDoctosData } = useContext(AppContext);
-//   const [docInfo, setDocInfo] = useState(null);
-//   const [selectedDate, setSelectedDate] = useState(null);
-//   const [filteredSlots, setFilteredSlots] = useState([]);
-//   const [selectedSlot, setSelectedSlot] = useState(null);
-//   const [isLoading, setIsLoading] = useState(true); // true to load doctor
-
-//   const navigate = useNavigate();
-
-//   useEffect(() => {
-//     if (doctors.length > 0) {
-//       const doc = doctors.find((d) => d._id === docId);
-//       setDocInfo(doc);
-//       setIsLoading(false); // loading done
-//     }
-//   }, [doctors, docId]);
-
-//   useEffect(() => {
-//     if (docInfo && selectedDate) {
-//       const slots = docInfo.schedule.filter((slot) => slot.date === selectedDate);
-//       setFilteredSlots(slots);
-//       setSelectedSlot(null); // Reset selected slot when date changes
-//     }
-//   }, [docInfo, selectedDate]);
-
-//   // const handleBooking = async () => {
-//   //   if (!token) {
-//   //     toast.warning('Login to book appointment');
-//   //     return navigate('/login');
-//   //   }
-
-//   //   if (!selectedSlot) {
-//   //     toast.warning('Please select a time slot');
-//   //     return;
-//   //   }
-
-//   //   try {
-//   //     setIsLoading(true);
-//   //     const { data } = await axios.post(
-//   //       `${backendUrl}/api/user/book-appointment`,
-//   //       {
-//   //         doctorId: docId,
-//   //         slotId: selectedSlot._id,
-//   //       },
-//   //       {
-//   //         headers: { token },
-//   //       }
-//   //     );
-
-//   //     if (data.success) {
-//   //       toast.success("Booking ");
-//   //       getDoctosData();
-//   //       navigate('/my-appointments');
-//   //     } else {
-//   //       toast.error(data.message);
-//   //     }
-//   //   } catch (error) {
-//   //     console.error(error);
-//   //     toast.error(error.message);
-//   //   } finally {
-//   //     setIsLoading(false);
-//   //   }
-//   // };
-//   const handleBooking = async () => {
-//     if (!token) {
-//       toast.warning('Please log in to book an appointment!');
-//       return navigate('/login');
-//     }
-  
-//     if (!selectedSlot) {
-//       toast.warning('Please select a time slot!');
-//       return;
-//     }
-  
-//     try {
-//       setIsLoading(true);
-//       const { data } = await axios.post(
-//         `${backendUrl}/api/user/book-appointment`,
-//         {
-//           doctorId: docId,
-//           slotId: selectedSlot._id,
-//         },
-//         {
-//           headers: { token },
-//         }
-//       );
-  
-//       if (data.success) {
-//         toast.success(
-//           '🎉 Appointment booked successfully! Please arrive on time or check your appointment details in "My Appointments".'
-//         );
-//         getDoctosData();
-//         navigate('/my-appointments');
-//       } else {
-//         toast.error(data.message || 'Something went wrong while booking!');
-//       }
-//     } catch (error) {
-//       console.error(error);
-//       toast.error('An error occurred. Please try again later.');
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-  
-//   const getUniqueDates = () => {
-//     const dates = docInfo?.schedule.map((slot) => slot.date);
-//     return [...new Set(dates)];
-//   };
-
-//   const formatDateLabel = (date) => {
-//     const [day, month, year] = date.split('-');
-//     const dateObj = new Date(`${year}-${month}-${day}`);
-//     if (isNaN(dateObj)) return date;
-//     return dateObj.toLocaleDateString('en-US', {
-//       weekday: 'short',
-//       day: 'numeric',
-//       month: 'short',
-//     });
-//   };
-
-//   if (isLoading) return <Loading />;
-
-//   return docInfo ? (
-//     <div className="p-4">
-//       {/* Doctor Info */}
-//       <div className="flex flex-col sm:flex-row gap-4">
-//         <img className="w-full sm:max-w-72 rounded-lg" src={docInfo.image} alt="Doctor" />
-//         <div className="flex-1 border rounded-lg p-8 bg-white">
-//           <h2 className="text-3xl font-semibold text-gray-800 flex items-center gap-2">
-//             {docInfo.name}
-//             <img className="w-5" src={assets.verified_icon} alt="Verified" />
-//           </h2>
-//           <p className="mt-2 text-gray-600">{docInfo.degree} - {docInfo.speciality}</p>
-//           <p className="mt-2 text-sm text-gray-600">{docInfo.about}</p>
-//           <p className="mt-2 text-gray-700 font-medium">
-//             Appointment fee: {currencySymbol}{docInfo.fees}
-//           </p>
-//         </div>
-//       </div>
-
-//       {/* Date Selection */}
-//       <div className="mt-8">
-//         <h3 className="text-lg font-medium text-gray-700 mb-2">Select a date</h3>
-//         <div className="flex gap-3 overflow-x-auto">
-//           {getUniqueDates().map((date, idx) => (
-//             <div
-//               key={idx}
-//               onClick={() => setSelectedDate(date)}
-//               className={`px-4 py-3 text-center rounded-full cursor-pointer min-w-24 ${
-//                 selectedDate === date ? 'bg-primary text-white' : 'border border-gray-300 text-gray-700'
-//               }`}
-//             >
-//               <p>{formatDateLabel(date)}</p>
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-
-//       {/* Time Slot Selection */}
-//       {filteredSlots.length > 0 && (
-//         <div className="mt-6">
-//           <h3 className="text-lg font-medium text-gray-700 mb-2">Select a time slot</h3>
-//           <div className="flex flex-wrap gap-4">
-//             {filteredSlots.map((slot, idx) => (
-//               <div
-//                 key={idx}
-//                 onClick={() => setSelectedSlot(slot)}
-//                 className={`px-5 py-2 rounded-full text-sm cursor-pointer ${
-//                   selectedSlot?._id === slot._id
-//                     ? 'bg-primary text-white'
-//                     : 'border border-gray-300 text-gray-700'
-//                 }`}
-//               >
-//                 {slot.startTime} - {slot.endTime}
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-//       )}
-
-//       {/* Booking Button */}
-//       <div className="mt-8">
-//         <button
-//           onClick={handleBooking}
-//           className="bg-primary text-white px-8 py-3 rounded-full text-sm"
-//         >
-//           Book Appointment
-//         </button>
-//       </div>
-//     </div>
-//   ) : null;
-// };
-
-// export default Appointment;
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
@@ -349,9 +145,9 @@ const Appointment = () => {
               </h2>
               <p className="mt-2 text-gray-600">{docInfo.degree} - {docInfo.speciality}</p>
               <p className="mt-2 text-sm text-gray-600">{docInfo.about}</p>
-              <p className="mt-2 text-gray-700 font-medium">
+              {/* <p className="mt-2 text-gray-700 font-medium">
                 Appointment fee: {currencySymbol}{docInfo.fees}
-              </p>
+              </p> */}
             </div>
           </div>
 
@@ -376,19 +172,22 @@ const Appointment = () => {
             <div className="mt-6">
               <h3 className="text-lg font-medium text-gray-700 mb-2">Select a time slot</h3>
               <div className="flex flex-wrap gap-4">
-                {filteredSlots.map((slot, idx) => (
-                  <div
-                    key={idx}
-                    onClick={() => setSelectedSlot(slot)}
-                    className={`px-5 py-2 rounded-full text-sm cursor-pointer ${
-                      selectedSlot?._id === slot._id
-                        ? 'bg-primary text-white'
-                        : 'border border-gray-300 text-gray-700'
-                    }`}
-                  >
-                    {slot.startTime} - {slot.endTime}
-                  </div>
-                ))}
+              {filteredSlots.map((slot, idx) => (
+  <div
+    key={idx}
+    onClick={() => setSelectedSlot(slot)}
+    className={`flex flex-col items-center justify-center px-5 py-3 rounded-xl text-sm cursor-pointer transition-all duration-200 shadow-sm min-w-[120px]
+      ${selectedSlot?._id === slot._id
+        ? 'bg-primary text-white scale-105'
+        : 'border border-gray-300 text-gray-700 bg-white hover:bg-gray-50'}`}
+  >
+    <p className="font-medium">{slot.startTime} - {slot.endTime}</p>
+    <p className="text-xs mt-1">
+      {currencySymbol}{slot.fees}
+    </p>
+  </div>
+))}
+
               </div>
             </div>
           )}

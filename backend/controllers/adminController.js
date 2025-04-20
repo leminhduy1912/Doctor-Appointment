@@ -70,14 +70,14 @@ const addDoctor = async (req, res) => {
     try {
         const {
             image, name, email, password, speciality,
-            degree, experience, about, fees,
+            degree, experience, about,
             address, phoneNumber, schedule
         } = req.body;
 
         console.log("Adding doctor:", name);
 
         // Kiểm tra thiếu trường
-        if (!name || !email || !password || !speciality || !degree || !experience || !about || !fees || !address || !phoneNumber) {
+        if (!name || !email || !password || !speciality || !degree || !experience || !about  || !address || !phoneNumber) {
             return res.status(400).json({ success: false, message: "Missing Details" });
         }
 
@@ -121,7 +121,6 @@ const addDoctor = async (req, res) => {
             degree,
             experience,
             about,
-            fees,
             address: formattedAddress,
             schedule: formattedSchedule,
             image: imageUrl,

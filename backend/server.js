@@ -12,6 +12,7 @@ import connectCloudinary from './config/cloudinary.js';
 import router from './routes/payment.js';
 // import { sendEmail } from './config/mailer.js';
 import emailRouter from './routes/emailRoute.js';
+import paymentRouter from './routes/receiptRoute.js';
 dotenv.config();
 //app config
 const app = express();
@@ -42,18 +43,14 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'token', 'aToken', 'dToken'],
 }));
 
-// app.use(cors({
-//     origin: process.env.CLIENT_URL || 'http://localhost:5173', // URL của frontend
-//     credentials: true,
-//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-//     allowedHeaders: ['Content-Type', 'Authorization', 'token'], 
-//   }))
+
 //api endpoint
 app.use("/api/user", userRouter)
 app.use("/api/admin", adminRouter)
 app.use("/api/doctor",doctorRouter)
 app.use('/order', router)
 app.use("/api/email",emailRouter)
+app.use("/api/receipt",paymentRouter)
 app.get("/",(req,res)=>{
     res.send("api working")
 })

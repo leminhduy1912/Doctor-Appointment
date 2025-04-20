@@ -1,5 +1,6 @@
 import express from 'express'
-import { sendOtpEmail } from '../config/mailer.js'
+import { sendOtpRegisterEmail } from '../config/mailer.js'
+import { sendBookingConfirmToUserAndDoctor } from '../controllers/doctorController.js'
 
 
 const emailRouter = express.Router()
@@ -15,7 +16,7 @@ emailRouter.post('/send-otp', async (req, res) => {
   const otp = Math.floor(100000 + Math.random() * 900000).toString()
 
   try {
-    await sendOtpEmail({ to: email, otp })
+    await sendOtpRegisterEmail({ to: email, otp })
 
     // Lưu OTP vào Map kèm thời gian hết hạn
     otpStore.set(email, { otp, expiresAt: Date.now() + 5 * 60 * 1000 })
@@ -45,4 +46,8 @@ emailRouter.post('/verify-otp', (req, res) => {
   otpStore.delete(email)
   res.json({ success: true, message: 'OTP verified' })
 })
+
+
+emailRouter.post('/send-booking-confirm-to-doctor-and-user',sendBookingConfirmToUserAndDoctor)
+
 export default emailRouter
