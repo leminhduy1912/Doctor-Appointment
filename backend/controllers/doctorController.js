@@ -139,99 +139,10 @@ const appointmentsDoctor = async (req, res) => {
       });
     }
   };
-  const sendBookingConfirmToUserAndDoctor = async (req, res) => {
-    try {
-      const { slotId } = req.body;
-      console.log("slot id", slotId);
-  
-      // Tìm tất cả các cuộc hẹn có cùng slotId
-      const appointments = await appointmentModel.find({ slotId: slotId }).sort({ createdAt: -1 });
-  
-      if (!appointments || appointments.length === 0) {
-        return res.status(404).json({
-          success: false,
-          message: "No appointments found for this slotId"
-        });
-      }
-  
-      // Giả sử mỗi cuộc hẹn đều có docId, nên ta lấy thông tin bác sĩ từ appointment đầu tiên
-      const doctor = await doctorModel.findById(appointments[0].docId);
-      if (!doctor) {
-        return res.status(404).json({
-          success: false,
-          message: "Doctor not found"
-        });
-      }
-  
-      const formattedAppointments = [];
-  
-      for (const app of appointments) {
-        const slot = doctor.schedule.find(
-          (s) => s._id.toString() === app.slotId
-        );
-  
-        const date = slot?.date || app.slotDate;
-        const time = `${slot?.startTime || ''} - ${slot?.endTime || ''}`;
-        const docName = doctor.name;
-        const emailDoc = doctor.email;
-        const linkMeet = slot?.meetLink || "https://your-default-meet-link.com";
-        const patientName = app.userData?.name || "Patient";
-        const patientEmail = app.userData?.email || "patient@example.com";
-  
-        // Gửi mail xác nhận cho bệnh nhân
-        await sendConfirmationScheduleToUser(
-          patientEmail,   // email bệnh nhân
-          date,           // ngày hẹn
-          time,           // giờ hẹn
-          docName,        // tên bác sĩ
-          emailDoc,       // email bác sĩ
-          linkMeet,       // link meeting
-          slotId,         // slot id
-          patientName     // tên bệnh nhân
-        );
-  
-        // Gửi mail xác nhận cho bác sĩ
-        await sendConfirmationScheduleToDoctor(
-          emailDoc,       // email bác sĩ
-          date,           // ngày hẹn
-          time,           // giờ hẹn
-          docName,        // tên bác sĩ
-          patientName,    // tên bệnh nhân
-          patientEmail,   // email bệnh nhân
-          linkMeet,       // link meeting
-          slotId          // slot id
-        );
-  
-        // Format dữ liệu trả về
-        formattedAppointments.push({
-          _id: app._id,
-          userData: app.userData,
-          docData: app.docData,
-          amount: app.amount,
-          slotId: app.slotId,
-          slotDate: date,
-          slotTime: app.slotTime,
-          startTime: slot?.startTime,
-          endTime: slot?.endTime,
-          status: app.status,
-          createdAt: app.createdAt,
-          updatedAt: app.updatedAt
-        });
-      }
-  
-      return res.status(200).json({
-        success: true,
-        appointments: formattedAppointments
-      });
-  
-    } catch (error) {
-      console.error('Error fetching appointments by slotId:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Server error while fetching appointments by slotId.'
-      });
-    }
-  };
+
+
+
+ 
   
   
 //cancelled appointment
@@ -458,6 +369,6 @@ export {
     getDoctorProfileById,
     updateDoctorProfile,
     getAppointmentsBySlotId,
-    sendBookingConfirmToUserAndDoctor
+    
 }
 

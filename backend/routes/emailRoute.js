@@ -1,6 +1,6 @@
 import express from 'express'
 import { sendOtpRegisterEmail } from '../config/mailer.js'
-import { sendBookingConfirmToUserAndDoctor } from '../controllers/doctorController.js'
+import { sendBookingConfirmToUserAndDoctor } from '../controllers/userController.js'
 
 
 const emailRouter = express.Router()

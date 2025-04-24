@@ -122,7 +122,7 @@ const DoctorAppointments = () => {
   <span className='text-yellow-600 text-xs font-semibold'>Waiting for payment</span>
 ) : item.status === 'Confirmed' ? (
   <span className='text-lime-600 text-xs font-semibold'>Confirmed</span>
-) : item.status === 'pending' ? (
+) : item.status === 'Pending' ? (
   loadingId === item._id ? (
     <ClipLoader size={24} color="#4A90E2" />
   ) : (

@@ -1,27 +1,4 @@
 
-
-
-// import mongoose from "mongoose";
-
-// const appointmentSchema = new mongoose.Schema({
-//   patientId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-//   doctorId: { type: mongoose.Schema.Types.ObjectId, ref: "Doctor", required: true },
-//   appointmentDate: { type: Date, required: true }, 
-//   timeSlot: {
-//     startTime: { type: String, required: true }, 
-//     endTime: { type: String, required: true }     
-//   },
-//   status: {
-//     type: String,
-//     enum: ["pending", "confirmed", "completed", "cancelled"],
-//     default: "pending"
-//   },
-//   reason: String,
-//   amount: Number
-// }, { timestamps: true });
-
-// const appointmentModel = mongoose.models.Appointment || mongoose.model("Appointment", appointmentSchema);
-// export default appointmentModel;
 import mongoose from "mongoose";
 
 const appointmentSchema = new mongoose.Schema({
@@ -47,10 +24,11 @@ const appointmentSchema = new mongoose.Schema({
     speciality: String,
     image: String
   },
+  linkMeet: String,
   amount: { type: Number, required: true },
   slotId: { type: String, required: true }, 
-  slotTime: { type: String, required: true },     // e.g. "08:00 - 12:00"
-  slotDate: { type: String, required: true },     // e.g. "2025-04-16"
+  slotTime: { type: String, required: true },     
+  slotDate: { type: String, required: true },     
   date: { type: Date, default: Date.now },
   status: {
     type: String,

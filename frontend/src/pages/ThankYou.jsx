@@ -1,57 +1,79 @@
 import { useContext, useEffect, useState } from 'react';
-import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import { AppContext } from '../context/AppContext';
+import Loading from '../components/Loading';
 
 const ThankYou = () => {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // default to loading true
 
   const orderId = searchParams.get('vnp_TxnRef');
   const amount = searchParams.get('vnp_Amount');
   const slotId = searchParams.get('slotId');
 
   const invoiceNumber = `INV${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${orderId}`;
-    const { backendUrl, token } = useContext(AppContext)
+  const { backendUrl, token } = useContext(AppContext);
 
   useEffect(() => {
     const createReceipt = async () => {
       if (!isSubmitted && slotId && amount && orderId) {
         try {
-const slotId = localStorage.getItem('slotId')
+          const slotId = localStorage.getItem('slotId');
+          const doctorId = localStorage.getItem('docId');
+
+          // 1. Tạo hóa đơn
           await axios.post(
             `${backendUrl}/api/receipt/create`,
             {
               slotId,
-              amount: Number(amount) ,
+              amount: Number(amount),
               invoiceNumber,
             },
             {
-              headers: {
-                token: token,
-              },
+              headers: { token },
             }
           );
 
-          console.log('Receipt created successfully.');
+          // 2. Cập nhật trạng thái lịch hẹn
+          await axios.post(
+            `${backendUrl}/api/user/change-status-appointment`,
+            {
+              slotId,
+              doctorId,
+              newStatus: "Booked",
+            },
+            {
+              headers: { token },
+            }
+          );
+
+          // 3. Cập nhật linkMeet
+          await axios.post(
+            `${backendUrl}/api/user/send-booking-confirm-to-doctor-and-user`,
+            { slotId },
+            {
+              headers: { token },
+            }
+          );
+
+          console.log('Receipt, status, and linkMeet updated successfully.');
           setIsSubmitted(true);
         } catch (error) {
-          console.error('Failed to create receipt:', error);
+          console.error('Failed to complete post-payment flow:', error);
+        } finally {
+          setIsLoading(false);
         }
       }
     };
 
     createReceipt();
+  }, [slotId, amount, orderId, invoiceNumber, isSubmitted, backendUrl, token]);
 
-    const timer = setTimeout(() => {
-      navigate('/');
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, [slotId, amount, orderId, invoiceNumber, navigate, isSubmitted]);
+  if (isLoading) return <Loading />;
 
   return (
     <motion.div
@@ -71,22 +93,20 @@ const slotId = localStorage.getItem('slotId')
           </p>
         )}
 
-        <div className="flex flex-col sm:flex-row gap-4 w-full">
+        <div className="flex flex-col sm:flex-row gap-4 w-full justify-center items-center mt-6">
           <Link
             to="/"
             className="w-full sm:w-auto text-center bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-full transition duration-300"
           >
-            Về trang chủ
+            Back to Home
           </Link>
           <Link
-            to="/my-orders"
+            to="/my-appointments"
             className="w-full sm:w-auto text-center border border-green-500 text-green-500 hover:bg-green-50 font-semibold py-2 px-6 rounded-full transition duration-300"
           >
-            Xem đơn hàng
+            View my schedule
           </Link>
         </div>
-
-        <p className="mt-6 text-sm text-gray-400">Bạn sẽ được chuyển về trang chủ sau 5 giây...</p>
       </div>
     </motion.div>
   );

@@ -5,7 +5,7 @@ import userModel from "../models/user.model.js";
 import {v2 as cloudinary} from "cloudinary"
 import doctorModel from "../models/doctor.model.js";
 import appointmentModel from "../models/appointment.model.js";
-import { sendNotiNewBookingToDoctor } from "../config/mailer.js";
+import { sendConfirmationScheduleToDoctor, sendConfirmationScheduleToUser, sendNotiNewBookingToDoctor } from "../config/mailer.js";
 // API to register user
 const registerUser = async (req, res) => {
 
@@ -240,7 +240,8 @@ const getAllAppointments = async (req, res) => {
         date: app.date,
         status: app.status,
         createdAt: app.createdAt,
-        updatedAt: app.updatedAt
+        updatedAt: app.updatedAt,
+        linkMeet:app.linkMeet
       }));
   
       return res.status(200).json({
@@ -256,6 +257,170 @@ const getAllAppointments = async (req, res) => {
     }
   }
   
+
+
+  const updateSlotStatus = async (req, res) => {
+      try {
+        const { doctorId, slotId, newStatus, isConfirm } = req.body;
+    
+        if (!doctorId || !slotId || !newStatus) {
+          return res.status(400).json({ success: false, message: "Missing required fields" });
+        }
+    
+        // 1. Tìm doctor
+        const doctor = await doctorModel.findById(doctorId);
+        if (!doctor) {
+          return res.json({ success: false, message: "Doctor not found" });
+        }
+    
+        // 2. Tìm slot trong schedule theo slotId
+        const slot = doctor.schedule.id(slotId);
+        if (!slot) {
+          return res.json({ success: false, message: "Slot not found" });
+        }
+    
+        // 3. Cập nhật status cho slot
+        slot.status = newStatus;
+        await doctor.save();
+    
+        // 4. Cập nhật tất cả appointment có slotId tương ứng
+        const updateResult = await appointmentModel.updateMany(
+          { docId: doctorId, slotId },
+          { $set: { status: newStatus } }
+        );
+    
+        // 5. Nếu xác nhận -> tìm appointment cụ thể để lấy thông tin gửi email
+        if (isConfirm) {
+          const appointment = await appointmentModel.findOne({ docId: doctorId, slotId });
+    
+          if (appointment) {
+            const patientEmail = appointment.userData.email;
+            const appointmentDate = appointment.slotDate;
+            const appointmentTime = appointment.slotTime;
+            const docName = appointment.docData.name;
+            const patientName = appointment.userData.name;
+    
+    
+            await sendConfirmationBookingAndPaymentRequestToUser(patientEmail, appointmentDate, appointmentTime, docName, patientName);
+          }
+        }
+    
+        res.json({
+          success: true,
+          message: "Slot and appointment status updated successfully",
+          updatedAppointments: updateResult.modifiedCount,
+          slotStatus: newStatus
+        });
+    
+      } catch (error) {
+        console.error("Error updating slot status:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+      }
+    };
+
+
+    const generateRandomString = (length = 10) => {
+      const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let result = '';
+      for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    };
+     const sendBookingConfirmToUserAndDoctor = async (req, res) => {
+        try {
+          const { slotId } = req.body;
+          console.log("slot id", slotId);
+      
+          // Tìm tất cả các cuộc hẹn có cùng slotId
+          const appointments = await appointmentModel.find({ slotId: slotId }).sort({ createdAt: -1 });
+      
+          if (!appointments || appointments.length === 0) {
+            return res.status(404).json({
+              success: false,
+              message: "No appointments found for this slotId"
+            });
+          }
+      
+          // Giả sử mỗi cuộc hẹn đều có docId, nên ta lấy thông tin bác sĩ từ appointment đầu tiên
+          const doctor = await doctorModel.findById(appointments[0].docId);
+          if (!doctor) {
+            return res.status(404).json({
+              success: false,
+              message: "Doctor not found"
+            });
+          }
+      
+          const formattedAppointments = [];
+      
+          for (const app of appointments) {
+            const slot = doctor.schedule.find(
+              (s) => s._id.toString() === app.slotId
+            );
+            const randomString = generateRandomString(10);
+            const date = slot?.date || app.slotDate;
+            const time = `${slot?.startTime || ''} - ${slot?.endTime || ''}`;
+            const docName = doctor.name;
+            const emailDoc = doctor.email;
+            const linkMeet = `${process.env.VIDEO_CALL_SERVER}/` + randomString;
+            const patientName = app.userData?.name || "Patient";
+            const patientEmail = app.userData?.email || "patient@example.com";
+      
+            // Gửi mail xác nhận cho bệnh nhân
+            await sendConfirmationScheduleToUser(
+              patientEmail,   // email bệnh nhân
+              date,           // ngày hẹn
+              time,           // giờ hẹn
+              docName,        // tên bác sĩ
+              emailDoc,       // email bác sĩ
+              linkMeet,       // link meeting
+              slotId,         // slot id
+              patientName     // tên bệnh nhân
+            );
+      
+            // Gửi mail xác nhận cho bác sĩ
+            await sendConfirmationScheduleToDoctor(
+              emailDoc,       // email bác sĩ
+              date,           // ngày hẹn
+              time,           // giờ hẹn
+              docName,        // tên bác sĩ
+              patientName,    // tên bệnh nhân
+              patientEmail,   // email bệnh nhân
+              linkMeet,       // link meeting
+              slotId          // slot id
+            );
+      
+            // Format dữ liệu trả về
+            formattedAppointments.push({
+              _id: app._id,
+              userData: app.userData,
+              docData: app.docData,
+              amount: app.amount,
+              slotId: app.slotId,
+              slotDate: date,
+              slotTime: app.slotTime,
+              startTime: slot?.startTime,
+              endTime: slot?.endTime,
+              status: app.status,
+              linkMeet:linkMeet,
+              createdAt: app.createdAt,
+              updatedAt: app.updatedAt
+            });
+          }
+      
+          return res.status(200).json({
+            success: true,
+            appointments: formattedAppointments
+          });
+      
+        } catch (error) {
+          console.error('Error fetching appointments by slotId:', error);
+          return res.status(500).json({
+            success: false,
+            message: 'Server error while fetching appointments by slotId.'
+          });
+        }
+      };
 export {
     loginUser,
     registerUser,
@@ -263,5 +428,7 @@ export {
     updateProfile,
     isUserExist,
     bookAppointment,
-    getAllAppointments
+    getAllAppointments,
+    updateSlotStatus,
+    sendBookingConfirmToUserAndDoctor
 }

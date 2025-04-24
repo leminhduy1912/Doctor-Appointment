@@ -13,6 +13,7 @@ import router from './routes/payment.js';
 // import { sendEmail } from './config/mailer.js';
 import emailRouter from './routes/emailRoute.js';
 import paymentRouter from './routes/receiptRoute.js';
+import appointmentRouter from './routes/appointmentRoute.js';
 dotenv.config();
 //app config
 const app = express();
@@ -51,6 +52,7 @@ app.use("/api/doctor",doctorRouter)
 app.use('/order', router)
 app.use("/api/email",emailRouter)
 app.use("/api/receipt",paymentRouter)
+app.use("/api/appointment",appointmentRouter)
 app.get("/",(req,res)=>{
     res.send("api working")
 })
