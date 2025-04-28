@@ -21,6 +21,7 @@ const appointmentSchema = new mongoose.Schema({
   docData: {
     _id: mongoose.Schema.Types.ObjectId,
     name: String,
+    email:String,
     speciality: String,
     image: String
   },
@@ -30,6 +31,7 @@ const appointmentSchema = new mongoose.Schema({
   slotTime: { type: String, required: true },     
   slotDate: { type: String, required: true },     
   date: { type: Date, default: Date.now },
+  reason:String,
   status: {
     type: String,
     enum: ["pending", "confirmed", "completed", "cancelled"],

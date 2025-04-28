@@ -5,7 +5,8 @@ import userModel from "../models/user.model.js";
 import {v2 as cloudinary} from "cloudinary"
 import doctorModel from "../models/doctor.model.js";
 import appointmentModel from "../models/appointment.model.js";
-import { sendConfirmationScheduleToDoctor, sendConfirmationScheduleToUser, sendNotiNewBookingToDoctor } from "../config/mailer.js";
+import { sendConfirmationCancelScheduleFromUserToDoctor, sendConfirmationScheduleToDoctor, sendConfirmationScheduleToUser, sendNotiNewBookingToDoctor } from "../config/mailer.js";
+import mongoose from "mongoose";
 // API to register user
 const registerUser = async (req, res) => {
 
@@ -200,6 +201,7 @@ const isUserExist = async (req, res) => {
           _id: doctor._id,
           name: doctor.name,
           speciality: doctor.speciality,
+          email:doctor.email,
           image: doctor.image
         },
         amount: slot.fees,
@@ -421,6 +423,58 @@ const getAllAppointments = async (req, res) => {
           });
         }
       };
+
+
+
+      const appointmentCancel = async (req, res) => {
+        try {
+          const { doctorId, appointmentId, reason } = req.body;
+      
+          const appointmentData = await appointmentModel.findById(appointmentId);
+          if (!appointmentData) {
+            return res.json({ success: false, message: "Appointment not found" });
+          }
+      
+          if (appointmentData.docId.toString() !== doctorId) {
+            return res.json({ success: false, message: "Unauthorized: You can only cancel your own appointments" });
+          }
+      
+          await appointmentModel.findByIdAndUpdate(appointmentId, {
+            status: "cancelled",
+            reason: reason || "No reason provided"
+          });
+      
+          await doctorModel.updateOne(
+            { _id: doctorId, "schedule._id": new mongoose.Types.ObjectId(appointmentData.slotId) },
+            { $set: { "schedule.$.status": "available" } }
+          );
+
+           // Chuẩn bị dữ liệu gửi mail
+        const to = appointmentData.docData.email;                   // email bác sĩ
+        const date = appointmentData.slotDate;                        // ngày hẹn
+        const time = appointmentData.slotTime;                        // giờ hẹn
+        const patientName = appointmentData.userData.name;           // tên bệnh nhân
+        const emailPatient = appointmentData.userData.email;         // email bệnh nhân
+        const slotId = appointmentData.slotId;                     // id slot
+        const docName = appointmentData.docData.name;                // tên bác sĩ
+
+        await sendConfirmationCancelScheduleFromUserToDoctor(
+            to,
+            date,
+            time,
+            patientName,
+            emailPatient,
+            slotId,
+            docName
+        );
+
+          return res.json({ success: true, message: "Appointment Cancelled and Slot Updated" });
+      
+        } catch (error) {
+          console.error("Error cancelling appointment:", error);
+          res.status(500).json({ success: false, message: "Internal Server Error" });
+        }
+      };
 export {
     loginUser,
     registerUser,
@@ -430,5 +484,6 @@ export {
     bookAppointment,
     getAllAppointments,
     updateSlotStatus,
-    sendBookingConfirmToUserAndDoctor
+    sendBookingConfirmToUserAndDoctor,
+    appointmentCancel
 }

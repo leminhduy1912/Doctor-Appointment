@@ -1718,6 +1718,517 @@ const info = await transporter.sendMail({
 console.log('receipt sent: %s', info.messageId)
 }
 
+export async function sendConfirmationCancelScheduleFromUserToDoctor(to,date,time,patientName,emailPatient,slotId,docName) {
+  const html=
+  `
+  <!--
+  * This email was built using Tabular.
+  * For more information, visit https://tabular.email
+  -->
+  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="en">
+  <head>
+  <title></title>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <!--[if !mso]>-->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <!--<![endif]-->
+  <meta name="x-apple-disable-message-reformatting" content="" />
+  <meta content="target-densitydpi=device-dpi" name="viewport" />
+  <meta content="true" name="HandheldFriendly" />
+  <meta content="width=device-width" name="viewport" />
+  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no" />
+  <style type="text/css">
+  table {
+  border-collapse: separate;
+  table-layout: fixed;
+  mso-table-lspace: 0pt;
+  mso-table-rspace: 0pt
+  }
+  table td {
+  border-collapse: collapse
+  }
+  .ExternalClass {
+  width: 100%
+  }
+  .ExternalClass,
+  .ExternalClass p,
+  .ExternalClass span,
+  .ExternalClass font,
+  .ExternalClass td,
+  .ExternalClass div {
+  line-height: 100%
+  }
+  body, a, li, p, h1, h2, h3 {
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  }
+  html {
+  -webkit-text-size-adjust: none !important
+  }
+  body, #innerTable {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale
+  }
+  #innerTable img+div {
+  display: none;
+  display: none !important
+  }
+  img {
+  Margin: 0;
+  padding: 0;
+  -ms-interpolation-mode: bicubic
+  }
+  h1, h2, h3, p, a {
+  line-height: inherit;
+  overflow-wrap: normal;
+  white-space: normal;
+  word-break: break-word
+  }
+  a {
+  text-decoration: none
+  }
+  h1, h2, h3, p {
+  min-width: 100%!important;
+  width: 100%!important;
+  max-width: 100%!important;
+  display: inline-block!important;
+  border: 0;
+  padding: 0;
+  margin: 0
+  }
+  a[x-apple-data-detectors] {
+  color: inherit !important;
+  text-decoration: none !important;
+  font-size: inherit !important;
+  font-family: inherit !important;
+  font-weight: inherit !important;
+  line-height: inherit !important
+  }
+  u + #body a {
+  color: inherit;
+  text-decoration: none;
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  }
+  a[href^="mailto"],
+  a[href^="tel"],
+  a[href^="sms"] {
+  color: inherit;
+  text-decoration: none
+  }
+  </style>
+  <style type="text/css">
+  @media (min-width: 481px) {
+  .hd { display: none!important }
+  }
+  </style>
+  <style type="text/css">
+  @media (max-width: 480px) {
+  .hm { display: none!important }
+  }
+  </style>
+  <style type="text/css">
+  @media (max-width: 480px) {
+  .t88{mso-line-height-alt:0px!important;line-height:0!important;display:none!important}.t89{padding-left:30px!important;padding-bottom:40px!important;padding-right:30px!important}.t6{padding-bottom:20px!important}.t5{line-height:28px!important;font-size:26px!important;letter-spacing:-1.04px!important}.t136{padding:40px 30px!important}.t132{padding-bottom:36px!important}.t128{text-align:center!important}.t101,.t105,.t107,.t111,.t113,.t117,.t119,.t123,.t125,.t99{display:revert!important}.t103,.t109,.t115,.t121,.t127{vertical-align:top!important;width:44px!important}.t1{padding-bottom:50px!important}.t3{width:80px!important}.t86{width:353px!important}
+  }
+  </style>
+  <!--[if !mso]>-->
+  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@500;700;800&amp;display=swap" rel="stylesheet" type="text/css" />
+  <!--<![endif]-->
+  <!--[if mso]>
+  <xml>
+  <o:OfficeDocumentSettings>
+  <o:AllowPNG/>
+  <o:PixelsPerInch>96</o:PixelsPerInch>
+  </o:OfficeDocumentSettings>
+  </xml>
+  <![endif]-->
+  </head>
+  <body id="body" class="t142" style="min-width:100%;Margin:0px;padding:0px;background-color:#242424;"><div class="t141" style="background-color:#242424;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td class="t140" style="font-size:0;line-height:0;mso-line-height-rule:exactly;background-color:#242424;" valign="top" align="center">
+  <!--[if mso]>
+  <v:background xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false">
+  <v:fill color="#242424"/>
+  </v:background>
+  <![endif]-->
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" align="center" id="innerTable"><tr><td><div class="t88" style="mso-line-height-rule:exactly;mso-line-height-alt:45px;line-height:45px;font-size:1px;display:block;">&nbsp;&nbsp;</div></td></tr><tr><td align="center">
+  <table class="t92" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="600" class="t91" style="background-color:#F8F8F8;width:600px;">
+  <table class="t90" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t89" style="padding:0 50px 20px 50px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100% !important;"><tr><td align="left">
+  <table class="t4" role="presentation" cellpadding="0" cellspacing="0" style="Margin-right:auto;"><tr><td width="130" class="t3" style="width:130px;">
+  <table class="t2" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t1" style="padding:0 0 60px 0;"><div style="font-size:0px;"><img class="t0" style="display:block;border:0;height:auto;width:100%;Margin:0;max-width:100%;" width="130" height="129.078125" alt="" src="https://8527de8c-2e2d-461a-8323-af2588c02fac.b-cdn.net/e/4ec395aa-4643-4b29-800d-7debde54016b/3c6945dc-6b0f-4a7f-86ce-23cb0fc42212.jpeg"/></div></td></tr></table>
+  </td></tr></table>
+  </td></tr><tr><td align="center">
+  <table class="t9" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t8" style="width:600px;">
+  <table class="t7" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t6" style="padding:0 0 15px 0;"><h1 class="t5" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:26px;font-weight:800;font-style:normal;font-size:24px;text-decoration:none;text-transform:none;letter-spacing:-1.56px;direction:ltr;color:#191919;text-align:left;mso-line-height-rule:exactly;mso-text-raise:1px;">Hi ${docName}</h1></td></tr></table>
+  </td></tr></table>
+  </td></tr><tr><td align="center">
+  <table class="t14" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t13" style="width:600px;">
+  <table class="t12" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t11" style="padding:0 0 22px 0;"><p class="t10" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;">We’re truly sorry to let you know that your appointment has been cancelled.
+  Please accept our sincerest apologies for any inconvenience this may cause you.</p></td></tr></table>
+  </td></tr></table>
+  </td></tr><tr><td align="center">
+  <table class="t19" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t18" style="width:600px;">
+  </td></tr></table>
+  </td></tr><tr><td align="center">
+  <table class="t24" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t23" style="width:600px;">
+  </td></tr></table>
+  </td></tr><tr><td align="center">
+  <table class="t30" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t29" style="width:600px;">
+  <table class="t28" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t27"><p class="t26" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;"><span class="t25" style="margin:0;Margin:0;font-weight:700;mso-line-height-rule:exactly;">Slot Id</span></p></td></tr></table>
+  </td></tr></table>
+  </td></tr><tr><td align="center">
+  <table class="t35" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t34" style="width:600px;">
+  <table class="t33" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t32" style="padding:0 0 22px 0;"><p class="t31" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;">${slotId}</p></td></tr></table>
+  </td></tr></table>
+  </td></tr><tr><td align="center">
+  <table class="t40" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t39" style="width:600px;">
+  <table class="t38" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t37"><p class="t36" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:700;font-style:normal;font-size:17px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;">Information Patient &amp; Booking&nbsp;</p></td></tr></table>
+  </td></tr></table>
+  </td></tr><tr><td align="center">
+  <table class="t47" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t46" style="width:600px;">
+  <table class="t45" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t44"><p class="t43" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;"><span class="t41" style="margin:0;Margin:0;font-weight:700;mso-line-height-rule:exactly;">Full Name Patien</span><span class="t42" style="margin:0;Margin:0;font-weight:700;mso-line-height-rule:exactly;">t:</span> ${patientName}</p></td></tr></table>
+  </td></tr></table>
+  </td></tr><tr><td align="center">
+  <table class="t53" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t52" style="width:600px;">
+  <table class="t51" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t50"><p class="t49" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;"><span class="t48" style="margin:0;Margin:0;font-weight:700;mso-line-height-rule:exactly;">Email Patient:</span> ${emailPatient}</p></td></tr></table>
+  </td></tr></table>
+  </td></tr><tr><td align="center">
+  <table class="t59" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t58" style="width:600px;">
+  <table class="t57" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t56"><p class="t55" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;"><span class="t54" style="margin:0;Margin:0;font-weight:700;mso-line-height-rule:exactly;">Booking Date:</span> ${date}</p></td></tr></table>
+  </td></tr></table>
+  </td></tr><tr><td align="center">
+  <table class="t65" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t64" style="width:600px;">
+  <table class="t63" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t62"><p class="t61" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;"><span class="t60" style="margin:0;Margin:0;font-weight:700;mso-line-height-rule:exactly;">Booking Time:</span> ${time}</p></td></tr></table>
+  </td></tr></table>
+  </td></tr><tr><td><div class="t66" style="mso-line-height-rule:exactly;mso-line-height-alt:30px;line-height:30px;font-size:1px;display:block;">&nbsp;&nbsp;</div></td></tr><tr><td align="center">
+  <table class="t74" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t73" style="width:600px;">
+  <table class="t72" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t71" style="padding:10px 0 0 0;"><p class="t70" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;">We deeply value your trust in our service, and we understand how important this appointment is to you.
+  If you would like to reschedule or if there’s anything else we can assist you with, please don’t hesitate to reach out.
+  Our team is always ready to support you and arrange a new appointment at your earliest convenience.
+  
+  
+  </td></tr></table>
+  <table class="t72" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t71" style="padding:10px 0 0 0;"><p class="t70" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;">
+  Thank you once again for your understanding and patience.
+  We look forward to welcoming you back soon and continuing to provide you with the best care possible.
+  
+  </td></tr></table>
+  </td></tr><tr><td><div class="t75" style="mso-line-height-rule:exactly;mso-line-height-alt:20px;line-height:20px;font-size:1px;display:block;">&nbsp;&nbsp;</div></td></tr><tr><td align="center">
+  <table class="t81" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t80" style="width:600px;">
+  </td></tr></table>
+  </td></tr><tr><td><div class="t82" style="mso-line-height-rule:exactly;mso-line-height-alt:20px;line-height:20px;font-size:1px;display:block;">&nbsp;&nbsp;</div></td></tr><tr><td align="left">
+  <table class="t87" role="presentation" cellpadding="0" cellspacing="0" style="Margin-right:auto;"><tr><td width="250" class="t86" style="background-color:#2720E6;overflow:hidden;width:250px;border-radius:44px 44px 44px 44px;">
+  </td></tr></table>
+  </td></tr></table></td></tr></table>
+  </td></tr></table>
+  </td></tr><tr><td align="center">
+  <table class="t139" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="600" class="t138" style="background-color:#242424;width:600px;">
+  <table class="t137" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t136" style="padding:48px 50px 48px 50px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100% !important;"><tr><td align="center">
+  <table class="t97" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t96" style="width:600px;">
+  <table class="t95" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t94"><p class="t93" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:800;font-style:normal;font-size:18px;text-decoration:none;text-transform:none;letter-spacing:-0.9px;direction:ltr;color:#757575;text-align:center;mso-line-height-rule:exactly;mso-text-raise:1px;">Want updates through more platforms?</p></td></tr></table>
+  </td></tr></table>
+  </td></tr><tr><td align="center">
+  <table class="t135" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t134" style="width:800px;">
+  <table class="t133" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t132" style="padding:10px 0 44px 0;"><div class="t131" style="width:100%;text-align:center;"><div class="t130" style="display:inline-block;"><table class="t129" role="presentation" cellpadding="0" cellspacing="0" align="center" valign="top">
+  <tr class="t128"><td></td><td class="t103" width="44" valign="top">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t102" style="width:100%;"><tr><td class="t99" style="width:10px;" width="10"></td><td class="t100"><div style="font-size:0px;"><img class="t98" style="display:block;border:0;height:auto;width:100%;Margin:0;max-width:100%;" width="24" height="24" alt="" src="https://8527de8c-2e2d-461a-8323-af2588c02fac.b-cdn.net/e/4ec395aa-4643-4b29-800d-7debde54016b/649a63fc-cd0a-4750-bbcc-79b1528b331b.png"/></div></td><td class="t101" style="width:10px;" width="10"></td></tr></table>
+  </td><td class="t109" width="44" valign="top">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t108" style="width:100%;"><tr><td class="t105" style="width:10px;" width="10"></td><td class="t106"><div style="font-size:0px;"><img class="t104" style="display:block;border:0;height:auto;width:100%;Margin:0;max-width:100%;" width="24" height="24" alt="" src="https://8527de8c-2e2d-461a-8323-af2588c02fac.b-cdn.net/e/4ec395aa-4643-4b29-800d-7debde54016b/f9284271-e6cd-429c-a733-642a62f1c710.png"/></div></td><td class="t107" style="width:10px;" width="10"></td></tr></table>
+  </td><td class="t115" width="44" valign="top">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t114" style="width:100%;"><tr><td class="t111" style="width:10px;" width="10"></td><td class="t112"><div style="font-size:0px;"><img class="t110" style="display:block;border:0;height:auto;width:100%;Margin:0;max-width:100%;" width="24" height="24" alt="" src="https://8527de8c-2e2d-461a-8323-af2588c02fac.b-cdn.net/e/4ec395aa-4643-4b29-800d-7debde54016b/e0e5b823-7c9f-4c51-bd3b-b1dbf1dffea0.png"/></div></td><td class="t113" style="width:10px;" width="10"></td></tr></table>
+  </td><td class="t121" width="44" valign="top">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t120" style="width:100%;"><tr><td class="t117" style="width:10px;" width="10"></td><td class="t118"><div style="font-size:0px;"><img class="t116" style="display:block;border:0;height:auto;width:100%;Margin:0;max-width:100%;" width="24" height="24" alt="" src="https://8527de8c-2e2d-461a-8323-af2588c02fac.b-cdn.net/e/4ec395aa-4643-4b29-800d-7debde54016b/646223c1-6bf9-4b68-a633-1c75c092c6a6.png"/></div></td><td class="t119" style="width:10px;" width="10"></td></tr></table>
+  </td><td class="t127" width="44" valign="top">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t126" style="width:100%;"><tr><td class="t123" style="width:10px;" width="10"></td><td class="t124"><div style="font-size:0px;"><img class="t122" style="display:block;border:0;height:auto;width:100%;Margin:0;max-width:100%;" width="24" height="24" alt="" src="https://8527de8c-2e2d-461a-8323-af2588c02fac.b-cdn.net/e/4ec395aa-4643-4b29-800d-7debde54016b/10955565-efe6-47c3-b8c8-a713635831fc.png"/></div></td><td class="t125" style="width:10px;" width="10"></td></tr></table>
+  </td>
+  <td></td></tr>
+  </table></div></div></td></tr></table>
+  </td></tr></table>
+  </td></tr></table></td></tr></table>
+  </td></tr></table>
+  </td></tr></table></td></tr></table></div><div class="gmail-fix" style="display: none; white-space: nowrap; font: 15px courier; line-height: 0;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</div></body>
+  </html>
+  `
+
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD 
+    }
+  })
+  
+  const info = await transporter.sendMail({
+    from: `Healthcare Booking System `,
+    to, 
+    subject:'Important Update: Your Appointment Has Been Cancelled',
+    html:html
+  })
+  
+  console.log('receipt sent: %s', info.messageId)
+  }
+  
+
+  export async function sendConfirmationCancelScheduleFromDoctorToUser(to,date,time,docName,emailDoc,slotId,patientName) {
+    const html=
+    `
+    <!--
+    * This email was built using Tabular.
+    * For more information, visit https://tabular.email
+    -->
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="en">
+    <head>
+    <title></title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <!--[if !mso]>-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--<![endif]-->
+    <meta name="x-apple-disable-message-reformatting" content="" />
+    <meta content="target-densitydpi=device-dpi" name="viewport" />
+    <meta content="true" name="HandheldFriendly" />
+    <meta content="width=device-width" name="viewport" />
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no" />
+    <style type="text/css">
+    table {
+    border-collapse: separate;
+    table-layout: fixed;
+    mso-table-lspace: 0pt;
+    mso-table-rspace: 0pt
+    }
+    table td {
+    border-collapse: collapse
+    }
+    .ExternalClass {
+    width: 100%
+    }
+    .ExternalClass,
+    .ExternalClass p,
+    .ExternalClass span,
+    .ExternalClass font,
+    .ExternalClass td,
+    .ExternalClass div {
+    line-height: 100%
+    }
+    body, a, li, p, h1, h2, h3 {
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    }
+    html {
+    -webkit-text-size-adjust: none !important
+    }
+    body, #innerTable {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale
+    }
+    #innerTable img+div {
+    display: none;
+    display: none !important
+    }
+    img {
+    Margin: 0;
+    padding: 0;
+    -ms-interpolation-mode: bicubic
+    }
+    h1, h2, h3, p, a {
+    line-height: inherit;
+    overflow-wrap: normal;
+    white-space: normal;
+    word-break: break-word
+    }
+    a {
+    text-decoration: none
+    }
+    h1, h2, h3, p {
+    min-width: 100%!important;
+    width: 100%!important;
+    max-width: 100%!important;
+    display: inline-block!important;
+    border: 0;
+    padding: 0;
+    margin: 0
+    }
+    a[x-apple-data-detectors] {
+    color: inherit !important;
+    text-decoration: none !important;
+    font-size: inherit !important;
+    font-family: inherit !important;
+    font-weight: inherit !important;
+    line-height: inherit !important
+    }
+    u + #body a {
+    color: inherit;
+    text-decoration: none;
+    font-size: inherit;
+    font-family: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    }
+    a[href^="mailto"],
+    a[href^="tel"],
+    a[href^="sms"] {
+    color: inherit;
+    text-decoration: none
+    }
+    </style>
+    <style type="text/css">
+    @media (min-width: 481px) {
+    .hd { display: none!important }
+    }
+    </style>
+    <style type="text/css">
+    @media (max-width: 480px) {
+    .hm { display: none!important }
+    }
+    </style>
+    <style type="text/css">
+    @media (max-width: 480px) {
+    .t88{mso-line-height-alt:0px!important;line-height:0!important;display:none!important}.t89{padding-left:30px!important;padding-bottom:40px!important;padding-right:30px!important}.t6{padding-bottom:20px!important}.t5{line-height:28px!important;font-size:26px!important;letter-spacing:-1.04px!important}.t136{padding:40px 30px!important}.t132{padding-bottom:36px!important}.t128{text-align:center!important}.t101,.t105,.t107,.t111,.t113,.t117,.t119,.t123,.t125,.t99{display:revert!important}.t103,.t109,.t115,.t121,.t127{vertical-align:top!important;width:44px!important}.t1{padding-bottom:50px!important}.t3{width:80px!important}.t86{width:353px!important}
+    }
+    </style>
+    <!--[if !mso]>-->
+    <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@500;700;800&amp;display=swap" rel="stylesheet" type="text/css" />
+    <!--<![endif]-->
+    <!--[if mso]>
+    <xml>
+    <o:OfficeDocumentSettings>
+    <o:AllowPNG/>
+    <o:PixelsPerInch>96</o:PixelsPerInch>
+    </o:OfficeDocumentSettings>
+    </xml>
+    <![endif]-->
+    </head>
+    <body id="body" class="t142" style="min-width:100%;Margin:0px;padding:0px;background-color:#242424;"><div class="t141" style="background-color:#242424;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td class="t140" style="font-size:0;line-height:0;mso-line-height-rule:exactly;background-color:#242424;" valign="top" align="center">
+    <!--[if mso]>
+    <v:background xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false">
+    <v:fill color="#242424"/>
+    </v:background>
+    <![endif]-->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" align="center" id="innerTable"><tr><td><div class="t88" style="mso-line-height-rule:exactly;mso-line-height-alt:45px;line-height:45px;font-size:1px;display:block;">&nbsp;&nbsp;</div></td></tr><tr><td align="center">
+    <table class="t92" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="600" class="t91" style="background-color:#F8F8F8;width:600px;">
+    <table class="t90" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t89" style="padding:0 50px 20px 50px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100% !important;"><tr><td align="left">
+    <table class="t4" role="presentation" cellpadding="0" cellspacing="0" style="Margin-right:auto;"><tr><td width="130" class="t3" style="width:130px;">
+    <table class="t2" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t1" style="padding:0 0 60px 0;"><div style="font-size:0px;"><img class="t0" style="display:block;border:0;height:auto;width:100%;Margin:0;max-width:100%;" width="130" height="129.078125" alt="" src="https://8527de8c-2e2d-461a-8323-af2588c02fac.b-cdn.net/e/4ec395aa-4643-4b29-800d-7debde54016b/3c6945dc-6b0f-4a7f-86ce-23cb0fc42212.jpeg"/></div></td></tr></table>
+    </td></tr></table>
+    </td></tr><tr><td align="center">
+    <table class="t9" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t8" style="width:600px;">
+    <table class="t7" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t6" style="padding:0 0 15px 0;"><h1 class="t5" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:26px;font-weight:800;font-style:normal;font-size:24px;text-decoration:none;text-transform:none;letter-spacing:-1.56px;direction:ltr;color:#191919;text-align:left;mso-line-height-rule:exactly;mso-text-raise:1px;">Hi ${patientName}</h1></td></tr></table>
+    </td></tr></table>
+    </td></tr><tr><td align="center">
+    <table class="t14" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t13" style="width:600px;">
+    <table class="t12" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t11" style="padding:0 0 22px 0;"><p class="t10" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;">We’re truly sorry to let you know that your appointment has been cancelled.
+    Please accept our sincerest apologies for any inconvenience this may cause you.</p></td></tr></table>
+    </td></tr></table>
+    </td></tr><tr><td align="center">
+    <table class="t19" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t18" style="width:600px;">
+    </td></tr></table>
+    </td></tr><tr><td align="center">
+    <table class="t24" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t23" style="width:600px;">
+    </td></tr></table>
+    </td></tr><tr><td align="center">
+    <table class="t30" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t29" style="width:600px;">
+    <table class="t28" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t27"><p class="t26" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;"><span class="t25" style="margin:0;Margin:0;font-weight:700;mso-line-height-rule:exactly;">Slot Id</span></p></td></tr></table>
+    </td></tr></table>
+    </td></tr><tr><td align="center">
+    <table class="t35" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t34" style="width:600px;">
+    <table class="t33" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t32" style="padding:0 0 22px 0;"><p class="t31" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;">${slotId}</p></td></tr></table>
+    </td></tr></table>
+    </td></tr><tr><td align="center">
+    <table class="t40" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t39" style="width:600px;">
+    <table class="t38" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t37"><p class="t36" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:700;font-style:normal;font-size:17px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;">Information Doctor &amp; Booking&nbsp;</p></td></tr></table>
+    </td></tr></table>
+    </td></tr><tr><td align="center">
+    <table class="t47" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t46" style="width:600px;">
+    <table class="t45" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t44"><p class="t43" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;"><span class="t41" style="margin:0;Margin:0;font-weight:700;mso-line-height-rule:exactly;">Full Name Docto</span><span class="t42" style="margin:0;Margin:0;font-weight:700;mso-line-height-rule:exactly;">r:</span> ${docName}</p></td></tr></table>
+    </td></tr></table>
+    </td></tr><tr><td align="center">
+    <table class="t53" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t52" style="width:600px;">
+    <table class="t51" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t50"><p class="t49" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;"><span class="t48" style="margin:0;Margin:0;font-weight:700;mso-line-height-rule:exactly;">Email Doctor:</span> ${emailDoc}</p></td></tr></table>
+    </td></tr></table>
+    </td></tr><tr><td align="center">
+    <table class="t59" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t58" style="width:600px;">
+    <table class="t57" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t56"><p class="t55" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;"><span class="t54" style="margin:0;Margin:0;font-weight:700;mso-line-height-rule:exactly;">Booking Date:</span> ${date}</p></td></tr></table>
+    </td></tr></table>
+    </td></tr><tr><td align="center">
+    <table class="t65" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t64" style="width:600px;">
+    <table class="t63" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t62"><p class="t61" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;"><span class="t60" style="margin:0;Margin:0;font-weight:700;mso-line-height-rule:exactly;">Booking Time:</span> ${time}</p></td></tr></table>
+    </td></tr></table>
+    </td></tr><tr><td><div class="t66" style="mso-line-height-rule:exactly;mso-line-height-alt:30px;line-height:30px;font-size:1px;display:block;">&nbsp;&nbsp;</div></td></tr><tr><td align="center">
+    <table class="t74" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t73" style="width:600px;">
+    <table class="t72" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t71" style="padding:10px 0 0 0;"><p class="t70" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;">We deeply value your trust in our service, and we understand how important this appointment is to you.
+    If you would like to reschedule or if there’s anything else we can assist you with, please don’t hesitate to reach out.
+    Our team is always ready to support you and arrange a new appointment at your earliest convenience.
+    
+    
+    </td></tr></table>
+    <table class="t72" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t71" style="padding:10px 0 0 0;"><p class="t70" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:500;font-style:normal;font-size:14px;text-decoration:none;text-transform:none;letter-spacing:-0.56px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;">
+    Thank you once again for your understanding and patience.
+    We look forward to welcoming you back soon and continuing to provide you with the best care possible.
+    
+    </td></tr></table>
+    </td></tr><tr><td><div class="t75" style="mso-line-height-rule:exactly;mso-line-height-alt:20px;line-height:20px;font-size:1px;display:block;">&nbsp;&nbsp;</div></td></tr><tr><td align="center">
+    <table class="t81" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t80" style="width:600px;">
+    </td></tr></table>
+    </td></tr><tr><td><div class="t82" style="mso-line-height-rule:exactly;mso-line-height-alt:20px;line-height:20px;font-size:1px;display:block;">&nbsp;&nbsp;</div></td></tr><tr><td align="left">
+    <table class="t87" role="presentation" cellpadding="0" cellspacing="0" style="Margin-right:auto;"><tr><td width="250" class="t86" style="background-color:#2720E6;overflow:hidden;width:250px;border-radius:44px 44px 44px 44px;">
+    </td></tr></table>
+    </td></tr></table></td></tr></table>
+    </td></tr></table>
+    </td></tr><tr><td align="center">
+    <table class="t139" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="600" class="t138" style="background-color:#242424;width:600px;">
+    <table class="t137" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t136" style="padding:48px 50px 48px 50px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100% !important;"><tr><td align="center">
+    <table class="t97" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t96" style="width:600px;">
+    <table class="t95" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t94"><p class="t93" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:22px;font-weight:800;font-style:normal;font-size:18px;text-decoration:none;text-transform:none;letter-spacing:-0.9px;direction:ltr;color:#757575;text-align:center;mso-line-height-rule:exactly;mso-text-raise:1px;">Want updates through more platforms?</p></td></tr></table>
+    </td></tr></table>
+    </td></tr><tr><td align="center">
+    <table class="t135" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;"><tr><td width="500" class="t134" style="width:800px;">
+    <table class="t133" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;"><tr><td class="t132" style="padding:10px 0 44px 0;"><div class="t131" style="width:100%;text-align:center;"><div class="t130" style="display:inline-block;"><table class="t129" role="presentation" cellpadding="0" cellspacing="0" align="center" valign="top">
+    <tr class="t128"><td></td><td class="t103" width="44" valign="top">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t102" style="width:100%;"><tr><td class="t99" style="width:10px;" width="10"></td><td class="t100"><div style="font-size:0px;"><img class="t98" style="display:block;border:0;height:auto;width:100%;Margin:0;max-width:100%;" width="24" height="24" alt="" src="https://8527de8c-2e2d-461a-8323-af2588c02fac.b-cdn.net/e/4ec395aa-4643-4b29-800d-7debde54016b/649a63fc-cd0a-4750-bbcc-79b1528b331b.png"/></div></td><td class="t101" style="width:10px;" width="10"></td></tr></table>
+    </td><td class="t109" width="44" valign="top">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t108" style="width:100%;"><tr><td class="t105" style="width:10px;" width="10"></td><td class="t106"><div style="font-size:0px;"><img class="t104" style="display:block;border:0;height:auto;width:100%;Margin:0;max-width:100%;" width="24" height="24" alt="" src="https://8527de8c-2e2d-461a-8323-af2588c02fac.b-cdn.net/e/4ec395aa-4643-4b29-800d-7debde54016b/f9284271-e6cd-429c-a733-642a62f1c710.png"/></div></td><td class="t107" style="width:10px;" width="10"></td></tr></table>
+    </td><td class="t115" width="44" valign="top">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t114" style="width:100%;"><tr><td class="t111" style="width:10px;" width="10"></td><td class="t112"><div style="font-size:0px;"><img class="t110" style="display:block;border:0;height:auto;width:100%;Margin:0;max-width:100%;" width="24" height="24" alt="" src="https://8527de8c-2e2d-461a-8323-af2588c02fac.b-cdn.net/e/4ec395aa-4643-4b29-800d-7debde54016b/e0e5b823-7c9f-4c51-bd3b-b1dbf1dffea0.png"/></div></td><td class="t113" style="width:10px;" width="10"></td></tr></table>
+    </td><td class="t121" width="44" valign="top">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t120" style="width:100%;"><tr><td class="t117" style="width:10px;" width="10"></td><td class="t118"><div style="font-size:0px;"><img class="t116" style="display:block;border:0;height:auto;width:100%;Margin:0;max-width:100%;" width="24" height="24" alt="" src="https://8527de8c-2e2d-461a-8323-af2588c02fac.b-cdn.net/e/4ec395aa-4643-4b29-800d-7debde54016b/646223c1-6bf9-4b68-a633-1c75c092c6a6.png"/></div></td><td class="t119" style="width:10px;" width="10"></td></tr></table>
+    </td><td class="t127" width="44" valign="top">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="t126" style="width:100%;"><tr><td class="t123" style="width:10px;" width="10"></td><td class="t124"><div style="font-size:0px;"><img class="t122" style="display:block;border:0;height:auto;width:100%;Margin:0;max-width:100%;" width="24" height="24" alt="" src="https://8527de8c-2e2d-461a-8323-af2588c02fac.b-cdn.net/e/4ec395aa-4643-4b29-800d-7debde54016b/10955565-efe6-47c3-b8c8-a713635831fc.png"/></div></td><td class="t125" style="width:10px;" width="10"></td></tr></table>
+    </td>
+    <td></td></tr>
+    </table></div></div></td></tr></table>
+    </td></tr></table>
+    </td></tr></table></td></tr></table>
+    </td></tr></table>
+    </td></tr></table></td></tr></table></div><div class="gmail-fix" style="display: none; white-space: nowrap; font: 15px courier; line-height: 0;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</div></body>
+    </html>
+    `
+  
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD 
+      }
+    })
+    
+    const info = await transporter.sendMail({
+      from: `Healthcare Booking System `,
+      to, 
+      subject:'Important Update: Your Appointment Has Been Cancelled',
+      html:html
+    })
+    
+    console.log('receipt sent: %s', info.messageId)
+    }
+
 
 export async function sendConfirmationScheduleToDoctor(to,date,time,docName,patientName,emailPatient,linkMeet,slotId) {
   const html=`

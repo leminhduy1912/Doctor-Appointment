@@ -2,7 +2,8 @@ import doctorModel from "../models/doctor.model.js"
 import bcrypt from 'bcrypt'
 import jwt from "jsonwebtoken";
 import appointmentModel from "../models/appointment.model.js";
-import { sendConfirmationBookingAndPaymentRequestToUser, sendConfirmationScheduleToDoctor, sendConfirmationScheduleToUser } from "../config/mailer.js";
+import { sendConfirmationBookingAndPaymentRequestToUser, sendConfirmationCancelScheduleFromDoctorToUser, sendConfirmationScheduleToDoctor, sendConfirmationScheduleToUser } from "../config/mailer.js";
+import mongoose from "mongoose";
 
 // API for doctor Login 
 const loginDoctor = async (req, res) => {
@@ -146,31 +147,99 @@ const appointmentsDoctor = async (req, res) => {
   
   
 //cancelled appointment
+// const appointmentCancel = async (req, res) => {
+//   try {
+//     const { doctorId, appointmentId, reason } = req.body;
+
+//     const appointmentData = await appointmentModel.findById(appointmentId);
+//     if (!appointmentData) {
+//       return res.json({ success: false, message: "Appointment not found" });
+//     }
+
+//     if (appointmentData.docId.toString() !== doctorId) {
+//       return res.json({ success: false, message: "Unauthorized: You can only cancel your own appointments" });
+//     }
+
+//     await appointmentModel.findByIdAndUpdate(appointmentId, {
+//       status: "cancelled",
+//       reason: reason || "No reason provided"
+//     });
+
+//     await doctorModel.updateOne(
+//       { _id: doctorId, "schedule._id": new mongoose.Types.ObjectId(appointmentData.slotId) },
+//       { $set: { "schedule.$.status": "available" } }
+//     );
+//     await sendConfirmationCancelScheduleFromDoctorToUser(to,date,time,docName,emailDoc,slotId,patientName)
+//     return res.json({ success: true, message: "Appointment Cancelled and Slot Updated" });
+
+//   } catch (error) {
+//     console.error("Error cancelling appointment:", error);
+//     res.status(500).json({ success: false, message: "Internal Server Error" });
+//   }
+// };
+
 const appointmentCancel = async (req, res) => {
-    try {
-        const { doctorId, appointmentId } = req.body;
+  try {
+    const { doctorId, appointmentId, reason } = req.body;
 
-        // Tìm cuộc hẹn theo ID
-        const appointmentData = await appointmentModel.findById(appointmentId);
-        if (!appointmentData) {
-            return res.json({ success: false, message: "Appointment not found" });
-        }
+    const appointmentData = await appointmentModel.findById(appointmentId)
+      .populate('userData') // lấy thông tin bệnh nhân
+      .populate('docData'); // lấy thông tin bác sĩ
 
-        // Kiểm tra xem cuộc hẹn có thuộc bác sĩ này không
-        if (appointmentData.doctorId.toString() !== doctorId) {
-            return res.json({ success: false, message: "Unauthorized: You can only cancel your own appointments" });
-        }
-
-        // Cập nhật trạng thái thành "cancelled"
-        await appointmentModel.findByIdAndUpdate(appointmentId, { status: "cancelled" });
-
-        return res.json({ success: true, message: "Appointment Cancelled" });
-
-    } catch (error) {
-        console.error("Error cancelling appointment:", error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
+    if (!appointmentData) {
+      return res.json({ success: false, message: "Appointment not found" });
     }
+
+    if (appointmentData.docId._id.toString() !== doctorId) {
+      return res.json({ success: false, message: "Unauthorized: You can only cancel your own appointments" });
+    }
+
+    if (appointmentData.status === 'booked') {
+      return res.json({ success: false, message: "Cannot cancel an appointment that is still booked." });
+    }
+
+    // Cập nhật trạng thái appointment
+    await appointmentModel.findByIdAndUpdate(appointmentId, {
+      status: "cancelled",
+      reason: reason || "No reason provided"
+    });
+
+    // Cập nhật trạng thái slot
+    await doctorModel.updateOne(
+      { _id: doctorId, "schedule._id": new mongoose.Types.ObjectId(appointmentData.slotId) },
+      { $set: { "schedule.$.status": "available" } }
+    );
+
+    // --- Chuẩn bị dữ liệu để gửi email ---
+    const to = appointmentData.userData.email;                  // Email bệnh nhân
+    const date = appointmentData.slotDate;                        // Ngày hẹn
+    const time = appointmentData.slotTime;                        // Giờ hẹn
+    const docName = appointmentData.docData.name;                // Tên bác sĩ
+    const emailDoc = appointmentData.docData.email;              // Email bác sĩ
+    const slotId = appointmentData.slotId;                     // ID slot
+    const patientName = appointmentData.userData.name;           // Tên bệnh nhân
+
+    // Gửi email
+    await sendConfirmationCancelScheduleFromDoctorToUser(
+      to,
+      date,
+      time,
+      docName,
+      emailDoc,
+      slotId,
+      patientName
+    );
+
+    return res.json({ success: true, message: "Appointment Cancelled and Slot Updated" });
+
+  } catch (error) {
+    console.error("Error cancelling appointment:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
 };
+
+
+
 //complete appointment
 const appointmentComplete = async (req, res) => {
     try {

@@ -11,7 +11,8 @@ const MyAppointments = () => {
     const navigate = useNavigate()
     const [isLoading, setIsLoading] = useState(false)
     const [appointments, setAppointments] = useState([])
-    const [confirmModal, setConfirmModal] = useState({ open: false, id: null })
+    const [confirmModal, setConfirmModal] = useState({ open: false, id: null, doctorId: null })
+    const [cancelReason, setCancelReason] = useState('')
     const [vnpayModal, setVnpayModal] = useState({ open: false, appointmentId: null })
     const [joinModal, setJoinModal] = useState({ open: false, link: null })
 
@@ -29,20 +30,27 @@ const MyAppointments = () => {
         }
     }
 
-    const cancelAppointment = async (appointmentId) => {
+    const cancelAppointment = async (appointmentId, doctorId, reason) => {
         try {
-            const { data } = await axios.post(`${backendUrl}/api/user/cancel-appointment`, { appointmentId }, {
-                headers: { token }
-            })
+            setIsLoading(true)
+            const token = localStorage.getItem('token')
+            console.log("token",token)
+            const { data } = await axios.post(`${backendUrl}/api/user/cancel-appointment`,
+                { doctorId, appointmentId, reason },
+                { headers: { token } }
+            )
             if (data.success) {
                 toast.success(data.message)
-                setConfirmModal({ open: false, id: null })
+                setConfirmModal({ open: false, id: null, doctorId: null })
+                setCancelReason('')
                 getUserAppointments()
             } else {
                 toast.error(data.message)
             }
         } catch (error) {
-            toast.error(error.message)
+            toast.error(error.response?.data?.message || error.message)
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -72,12 +80,10 @@ const MyAppointments = () => {
     }
 
     const handleJoinRoom = (link) => {
-        console.log(link)
         setJoinModal({ open: true, link })
     }
 
     const confirmJoinRoom = () => {
-        console.log(joinModal.link)
         if (joinModal.link) {
             window.open(joinModal.link, '_blank')
         }
@@ -124,7 +130,7 @@ const MyAppointments = () => {
                             )}
                             {item.status !== "Booked" && (
                                 <button
-                                    onClick={() => setConfirmModal({ open: true, id: item.slotId })}
+                                    onClick={() => setConfirmModal({ open: true, id: item._id, doctorId: item.docData._id })}
                                     className='sm:min-w-48 py-2 border rounded text-[#696969] hover:bg-red-600 hover:text-white transition-all duration-300'
                                 >
                                     Cancel appointment
@@ -155,9 +161,34 @@ const MyAppointments = () => {
                             initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }}
                             transition={{ type: "spring", stiffness: 300 }}>
                             <h2 className="text-lg font-semibold mb-4">Are you sure you want to cancel this appointment?</h2>
+                            <input
+                                type="text"
+                                value={cancelReason}
+                                onChange={(e) => setCancelReason(e.target.value)}
+                                placeholder="Enter your reason..."
+                                className="w-full px-4 py-2 mt-4 border rounded"
+                            />
                             <div className="flex justify-center gap-4 mt-6">
-                                <button onClick={() => setConfirmModal({ open: false, id: null })} className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-100">No</button>
-                                <button onClick={() => cancelAppointment(confirmModal.id)} className="px-4 py-2 border bg-red-500 text-white rounded hover:bg-red-600">Yes, Cancel</button>
+                                <button
+                                    onClick={() => {
+                                        setConfirmModal({ open: false, id: null, doctorId: null });
+                                        setCancelReason('');
+                                    }}
+                                    className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-100">
+                                    No
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        if (cancelReason.trim() === '') {
+                                            toast.error('Please enter a reason before proceeding.')
+                                        } else {
+                                            cancelAppointment(confirmModal.id, confirmModal.doctorId, cancelReason)
+                                        }
+                                    }}
+                                    className="px-4 py-2 border bg-red-500 text-white rounded hover:bg-red-600"
+                                >
+                                    Confirm
+                                </button>
                             </div>
                         </motion.div>
                     </motion.div>

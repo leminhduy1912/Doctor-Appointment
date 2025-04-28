@@ -114,15 +114,15 @@ const DoctorAppointments = () => {
 
                 {/* Desktop Action */}
                 <div className='sm:flex hidden justify-center items-center gap-2'>
-                {item.status === 'Cancelled' ? (
+                {item.status === 'cancelled' ? (
   <span className='text-red-500 text-xs font-semibold'>Cancelled</span>
-) : item.status === 'Completed' ? (
-  <span className='text-green-600 text-xs font-semibold'>Completed</span>
-) : item.status === 'Waiting for payment' ? (
+) : item.status === 'Booked' ? (
+  <span className='text-green-600 text-xs font-semibold'>Booked</span>
+) : item.status === 'waiting for payment' ? (
   <span className='text-yellow-600 text-xs font-semibold'>Waiting for payment</span>
 ) : item.status === 'Confirmed' ? (
   <span className='text-lime-600 text-xs font-semibold'>Confirmed</span>
-) : item.status === 'Pending' ? (
+) : item.status === 'pending' ? (
   loadingId === item._id ? (
     <ClipLoader size={24} color="#4A90E2" />
   ) : (
@@ -171,7 +171,7 @@ const DoctorAppointments = () => {
                 <motion.div className='bg-white rounded-xl p-6 shadow-lg w-80'
                   initial={{ scale: 0.8 }} animate={{ scale: 1 }} exit={{ scale: 0.8 }}>
                   <p className='text-lg font-semibold text-gray-700 mb-4'>
-                    {selectedAction.type === 'cancel' ? 'Cancel this appointment?' : 'Mark as completed?'}
+                    {selectedAction.type === 'cancel' ? 'Cancel this appointment?' : 'Do you want to confirm this appointment ?'}
                   </p>
                   <div className='flex justify-end gap-3'>
                     <button
