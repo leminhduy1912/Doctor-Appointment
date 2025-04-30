@@ -145,38 +145,7 @@ const appointmentsDoctor = async (req, res) => {
 
  
   
-  
-//cancelled appointment
-// const appointmentCancel = async (req, res) => {
-//   try {
-//     const { doctorId, appointmentId, reason } = req.body;
 
-//     const appointmentData = await appointmentModel.findById(appointmentId);
-//     if (!appointmentData) {
-//       return res.json({ success: false, message: "Appointment not found" });
-//     }
-
-//     if (appointmentData.docId.toString() !== doctorId) {
-//       return res.json({ success: false, message: "Unauthorized: You can only cancel your own appointments" });
-//     }
-
-//     await appointmentModel.findByIdAndUpdate(appointmentId, {
-//       status: "cancelled",
-//       reason: reason || "No reason provided"
-//     });
-
-//     await doctorModel.updateOne(
-//       { _id: doctorId, "schedule._id": new mongoose.Types.ObjectId(appointmentData.slotId) },
-//       { $set: { "schedule.$.status": "available" } }
-//     );
-//     await sendConfirmationCancelScheduleFromDoctorToUser(to,date,time,docName,emailDoc,slotId,patientName)
-//     return res.json({ success: true, message: "Appointment Cancelled and Slot Updated" });
-
-//   } catch (error) {
-//     console.error("Error cancelling appointment:", error);
-//     res.status(500).json({ success: false, message: "Internal Server Error" });
-//   }
-// };
 
 const appointmentCancel = async (req, res) => {
   try {

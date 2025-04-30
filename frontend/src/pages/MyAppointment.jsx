@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
@@ -8,7 +7,6 @@ import Loading from '../components/Loading'
 
 const MyAppointments = () => {
     const { backendUrl, token } = useContext(AppContext)
-    const navigate = useNavigate()
     const [isLoading, setIsLoading] = useState(false)
     const [appointments, setAppointments] = useState([])
     const [confirmModal, setConfirmModal] = useState({ open: false, id: null, doctorId: null })
@@ -31,17 +29,19 @@ const MyAppointments = () => {
     }
 
     const cancelAppointment = async (appointmentId, doctorId, reason) => {
+        setConfirmModal({ open: false, id: null, doctorId: null }) // Đóng modal ngay lập tức
+        setIsLoading(true) // Hiện hiệu ứng loading
+    
         try {
-            setIsLoading(true)
             const token = localStorage.getItem('token')
-            console.log("token",token)
-            const { data } = await axios.post(`${backendUrl}/api/user/cancel-appointment`,
+            const { data } = await axios.post(
+                `${backendUrl}/api/user/cancel-appointment`,
                 { doctorId, appointmentId, reason },
                 { headers: { token } }
             )
+    
             if (data.success) {
-                toast.success(data.message)
-                setConfirmModal({ open: false, id: null, doctorId: null })
+                toast.success("Cancel appointment successfully")
                 setCancelReason('')
                 getUserAppointments()
             } else {
@@ -53,6 +53,7 @@ const MyAppointments = () => {
             setIsLoading(false)
         }
     }
+    
 
     const handleVNPAYPayment = async () => {
         try {
@@ -128,7 +129,7 @@ const MyAppointments = () => {
                             {item.isCompleted && (
                                 <button className='sm:min-w-48 py-2 border border-green-500 rounded text-green-500'>Completed</button>
                             )}
-                            {item.status !== "Booked" && (
+                            {item.status !== "Booked" || item.status=="Cancelled" && (
                                 <button
                                     onClick={() => setConfirmModal({ open: true, id: item._id, doctorId: item.docData._id })}
                                     className='sm:min-w-48 py-2 border rounded text-[#696969] hover:bg-red-600 hover:text-white transition-all duration-300'
