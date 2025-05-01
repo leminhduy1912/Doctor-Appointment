@@ -243,7 +243,8 @@ const getAllAppointments = async (req, res) => {
         status: app.status,
         createdAt: app.createdAt,
         updatedAt: app.updatedAt,
-        linkMeet:app.linkMeet
+        linkMeet:app.linkMeet,
+        reason:app.reason
       }));
   
       return res.status(200).json({

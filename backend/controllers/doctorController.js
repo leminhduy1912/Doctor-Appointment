@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import appointmentModel from "../models/appointment.model.js";
 import { sendConfirmationBookingAndPaymentRequestToUser, sendConfirmationCancelScheduleFromDoctorToUser, sendConfirmationScheduleToDoctor, sendConfirmationScheduleToUser } from "../config/mailer.js";
 import mongoose from "mongoose";
-
+import moment from'moment'
 // API for doctor Login 
 const loginDoctor = async (req, res) => {
 
@@ -209,29 +209,29 @@ const appointmentCancel = async (req, res) => {
 
 
 
-//complete appointment
-const appointmentComplete = async (req, res) => {
-    try {
-        const { doctorId, appointmentId } = req.body;
+// //complete appointment
+// const appointmentComplete = async (req, res) => {
+//     try {
+//         const { doctorId, appointmentId } = req.body;
 
-        const appointmentData = await appointmentModel.findById(appointmentId);
-        if (!appointmentData) {
-            return res.json({ success: false, message: "Appointment not found" });
-        }
+//         const appointmentData = await appointmentModel.findById(appointmentId);
+//         if (!appointmentData) {
+//             return res.json({ success: false, message: "Appointment not found" });
+//         }
 
-        if (appointmentData.doctorId.toString() !== doctorId) {
-            return res.json({ success: false, message: "Unauthorized: You can only complete your own appointments" });
-        }
+//         if (appointmentData.doctorId.toString() !== doctorId) {
+//             return res.json({ success: false, message: "Unauthorized: You can only complete your own appointments" });
+//         }
 
-        await appointmentModel.findByIdAndUpdate(appointmentId, { status: "completed" });
+//         await appointmentModel.findByIdAndUpdate(appointmentId, { status: "completed" });
 
-        return res.json({ success: true, message: "Appointment Completed" });
+//         return res.json({ success: true, message: "Appointment Completed" });
 
-    } catch (error) {
-        console.error("Error completing appointment:", error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
-    }
-};
+//     } catch (error) {
+//         console.error("Error completing appointment:", error);
+//         res.status(500).json({ success: false, message: "Internal Server Error" });
+//     }
+// };
 
 //get doctor list
 const getDoctorList = async (req, res) => {
@@ -281,6 +281,71 @@ const getDoctorProfileById = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
+const getScheduleDoctorPagination = async (req, res) => {
+  try {
+    const { doctorId, page = 1, limit = 7 } = req.body;
+
+    const doctor = await doctorModel.findById(doctorId).select('schedule');
+    if (!doctor) {
+      return res.status(404).json({ success: false, message: 'Doctor not found' });
+    }
+
+    let allSchedules = doctor.schedule || [];
+
+    // Sort schedule theo ngày giảm dần (mới nhất trước)
+    allSchedules.sort((a, b) => {
+      const [dA, mA, yA] = a.date.split('-');
+      const [dB, mB, yB] = b.date.split('-');
+      const dateA = new Date(`${yA}-${mA}-${dA}T${a.startTime}`);
+      const dateB = new Date(`${yB}-${mB}-${dB}T${b.startTime}`);
+      return dateB - dateA; // mới nhất trước
+    });
+
+    const totalSchedules = allSchedules.length;
+    const totalPages = Math.ceil(totalSchedules / limit);
+    const startIndex = (page - 1) * limit;
+    const paginatedSchedules = allSchedules.slice(startIndex, startIndex + limit);
+
+    return res.json({
+      success: true,
+      schedules: paginatedSchedules,
+      totalPages,
+      currentPage: Number(page),
+    });
+  } catch (err) {
+    console.error('Schedule pagination error:', err);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+};
+
+// const getScheduleDoctorPagination = async (req, res) => {
+//   try {
+//     const { doctorId, page = 1, limit = 7 } = req.body;
+
+//     const doctor = await doctorModel.findById(doctorId).select('schedule');
+//     if (!doctor) {
+//       return res.status(404).json({ success: false, message: 'Doctor not found' });
+//     }
+
+//     const allSchedules = doctor.schedule || [];
+//     const totalSchedules = allSchedules.length;
+//     const totalPages = Math.ceil(totalSchedules / limit);
+//     const startIndex = (page - 1) * limit;
+//     const paginatedSchedules = allSchedules.slice(startIndex, startIndex + limit).reverse();
+
+//     return res.json({
+//       success: true,
+//       schedules: paginatedSchedules,
+//       totalPages,
+//       currentPage: Number(page),
+//     });
+//   } catch (err) {
+//     console.error('Schedule pagination error:', err);
+//     res.status(500).json({ success: false, message: 'Internal Server Error' });
+//   }
+// };
+
+
 //update profile doctor
 const updateDoctorProfile = async (req, res) => {
     try {
@@ -390,9 +455,109 @@ const updateSlotStatus = async (req, res) => {
   };
   
 
+
+
   
-  
-  
+const updateDoctorSchedule = async (req, res) => {
+  try {
+    const { doctorId, day, date, newSlot, actionType, fees = "50000" } = req.body;
+
+    const doctor = await doctorModel.findById(doctorId);
+    if (!doctor) {
+      return res.status(404).json({ message: 'Doctor not found.' });
+    }
+
+    // Normalize the date for comparison
+    const normalizeDate = (str) => {
+      const [day, month, year] = str.split('-');
+      return `${year}-${month}-${day}`;
+    };
+
+    if (actionType === 'add') {
+      // Check for conflicts in the schedule
+      const hasConflict = doctor.schedule.some((slot) => {
+        if (slot.date !== date) return false;
+
+        const existingStart = slot.startTime;
+        const existingEnd = slot.endTime;
+        const newStart = newSlot.startTime;
+        const newEnd = newSlot.endTime;
+
+        return (
+          (newStart >= existingStart && newStart < existingEnd) ||
+          (newEnd > existingStart && newEnd <= existingEnd) ||
+          (newStart <= existingStart && newEnd >= existingEnd)
+        );
+      });
+
+      if (hasConflict) {
+        return res.status(400).json({ message: 'Time slot overlaps with existing schedule.' });
+      }
+
+      // Create the new schedule object
+      const newSchedule = {
+        day,
+        date,
+        startTime: newSlot.startTime,
+        endTime: newSlot.endTime,
+        fees,
+        status: 'available'
+      };
+
+      // Insert the new schedule at the correct position based on date and time
+      const index = doctor.schedule.findIndex((slot) => {
+        const [d, m, y] = slot.date.split('-');
+        const existingDate = new Date(`${y}-${m}-${d}T${slot.startTime}`);
+        const newDate = new Date(`${date}T${newSlot.startTime}`);
+        
+        return existingDate > newDate; // Find the first slot that comes after the new schedule
+      });
+
+      // If an appropriate index is found, insert it; otherwise, push it to the end
+      if (index !== -1) {
+        doctor.schedule.splice(index, 0, newSchedule);
+      } else {
+        doctor.schedule.push(newSchedule);
+      }
+
+    } else if (actionType === 'remove') {
+      // Check if the slot exists and is available for removal
+      const index = doctor.schedule.findIndex(
+        (slot) =>
+          slot.date === date &&
+          slot.startTime === newSlot.startTime &&
+          slot.endTime === newSlot.endTime
+      );
+
+      if (index === -1) {
+        return res.status(404).json({ message: 'No schedule found for that date and time.' });
+      }
+
+      if (doctor.schedule[index].status !== 'available') {
+        return res.status(400).json({ message: 'This slot has been booked and cannot be removed.' });
+      }
+
+      doctor.schedule.splice(index, 1);
+    }
+
+    // Sort the schedule by date and time in descending order (new dates appear before older dates)
+    doctor.schedule.sort((a, b) => {
+      const toDateTime = (item) => {
+        const [d, m, y] = item.date.split('-');
+        return new Date(`${y}-${m}-${d}T${item.startTime}`);
+      };
+      return toDateTime(b) - toDateTime(a); // Sort by date in descending order (latest date first)
+    });
+
+    await doctor.save();
+    return res.status(200).json({ message: 'Schedule updated successfully.', schedule: doctor.schedule });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal server error.' });
+  }
+};
+
   
 
 export {
@@ -402,11 +567,12 @@ export {
     appointmentCancel,
     getDoctorList,
     updateStatus,
-    appointmentComplete,
+    // appointmentComplete,
+    getScheduleDoctorPagination,
     doctorDashboard,
     getDoctorProfileById,
     updateDoctorProfile,
     getAppointmentsBySlotId,
-    
+    updateDoctorSchedule
 }
 

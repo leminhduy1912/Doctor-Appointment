@@ -12,6 +12,7 @@ import DoctorsList from './pages/Admin/DoctorList';
 import DoctorProfile from './pages/Doctor/DoctorProfile';
 import AddDoctor from './pages/Admin/AddDoctor';
 import DoctorAppointments from './pages/Doctor/DoctorAppointments';
+import DoctorSchedule from './pages/Doctor/DoctorSchedule';
 function App() {
   const { dToken } = useContext(DoctorContext)
   const { aToken } = useContext(AdminContext)
@@ -20,13 +21,14 @@ function App() {
     <div className='bg-[#F8F9FD]'>
       <ToastContainer />
       <Navbar />
-      <div className='flex items-start'>
+      <div className='flex justify-start'>
         <Sidebar />
         <Routes>
           <Route path='/' element={<></>} />
           <Route path='/doctor-list' element={<DoctorsList />} />
           <Route path='/doctor-profile' element={<DoctorProfile />} />
           <Route path='/add-doctor' element={<AddDoctor />} />
+          <Route path='/doctor-schedule' element={<DoctorSchedule />} />
           <Route path='/doctor-appointments' element={<DoctorAppointments />} />
           {/* <Route path='/admin-dashboard' element={<Dashboard />} />
           <Route path='/all-appointments' element={<AllAppointments />} />

@@ -40,6 +40,7 @@ const Login = () => {
           setDId(data.id);
           console.log("dId",dId)
           localStorage.setItem('dToken', data.token);
+          localStorage.setItem('id', data.id);
           toast.success("Doctor login successful!");
         } else {
           toast.error(data.message);

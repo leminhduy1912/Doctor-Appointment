@@ -109,6 +109,14 @@ const MyAppointments = () => {
                             <p className='mt-1'><span className='font-medium text-[#3C3C3C]'>Date & Time:</span> {item.slotDate} | {item.slotTime}</p>
                             <p className='mt-1'><span className='font-medium text-[#3C3C3C]'>Status:</span> {renderStatusBadge(item.status)}</p>
                         </div>
+                        {item.reason && (
+  <div className='flex flex-col gap-2 justify-center text-sm text-center'>
+    <p className='sm:min-w-48 py-2 border rounded bg-[#EAEFFF] text-[#696969]'>
+      <span className="font-semibold">Reason:</span> {item.reason}
+    </p>
+  </div>
+)}
+
                         <div className='flex flex-col gap-2 justify-end text-sm text-center'>
                             {item.status === "Waiting for payment" && !item.payment && (
                                 <button
@@ -126,6 +134,9 @@ const MyAppointments = () => {
                             {item.payment && !item.cancelled && !item.isCompleted && (
                                 <button className='sm:min-w-48 py-2 border rounded bg-[#EAEFFF] text-[#696969]'>Paid</button>
                             )}
+                            {/* {item.reason && (
+                                <button className='sm:min-w-48 py-2 border rounded bg-[#EAEFFF] text-[#696969]'>{item.reason}</button>
+                            )} */}
                             {item.isCompleted && (
                                 <button className='sm:min-w-48 py-2 border border-green-500 rounded text-green-500'>Completed</button>
                             )}
