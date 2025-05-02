@@ -44,7 +44,7 @@ const ThankYou = () => {
             {
               slotId,
               doctorId,
-              newStatus: "Booked",
+              newStatus: "booked",
             },
             {
               headers: { token },

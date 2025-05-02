@@ -34,55 +34,237 @@ const loginDoctor = async (req, res) => {
 }
 
 // API to get doctor appointments for doctor panel
+// const appointmentsDoctor = async (req, res) => {
+//     try {
+//       const { doctorId } = req.body;
+  
+//       // Lấy danh sách các lịch hẹn theo docId (không phải doctorId)
+//       const appointments = await appointmentModel.find({ docId: doctorId }).sort({ createdAt: -1 });
+  
+//       // Tìm bác sĩ để lấy lịch làm việc chi tiết
+//       const doctor = await doctorModel.findById(doctorId);
+  
+//       if (!doctor) {
+//         return res.status(404).json({ success: false, message: "Doctor not found" });
+//       }
+  
+//       const formattedAppointments = appointments.map((app) => {
+//         // Tìm lịch cụ thể theo slotId nếu có
+//         const slot = doctor.schedule.find(
+//           (s) => s._id.toString() === app.slotId
+//         );
+  
+//         return {
+//           _id: app._id,
+//           userData: app.userData,
+//           docData:app.docData,
+//           amount: app.amount,
+//           slotId: app.slotId,
+//           slotDate: slot?.date || app.slotDate,
+//           slotTime: app.slotTime,
+//           startTime: slot?.startTime,
+//           endTime: slot?.endTime,
+//           status: app.status,
+//           createdAt: app.createdAt,
+//           updatedAt: app.updatedAt
+//         };
+//       });
+  
+//       return res.status(200).json({
+//         success: true,
+//         appointments: formattedAppointments
+//       });
+//     } catch (error) {
+//       console.error('Error fetching doctor appointments:', error);
+//       return res.status(500).json({
+//         success: false,
+//         message: 'Server error while getting doctor appointments.'
+//       });
+//     }
+//   };
+// const appointmentsDoctor = async (req, res) => {
+//   try {
+//     const { doctorId } = req.body;
+//     const page = parseInt(req.query.page) || 1;
+//     const limit = 7;
+//     const skip = (page - 1) * limit;
+
+//     // Đếm tổng số lịch hẹn
+//     const totalAppointments = await appointmentModel.countDocuments({ docId: doctorId });
+
+//     // Lấy danh sách lịch hẹn có phân trang và sắp xếp theo bookingDate mới nhất
+//     const appointments = await appointmentModel
+//       .find({ docId: doctorId })
+//       .sort({ bookingDate: -1 }) // ✅ Sắp xếp theo bookingDate
+//       .skip(skip)
+//       .limit(limit);
+
+//     // Lấy thông tin bác sĩ
+//     const doctor = await doctorModel.findById(doctorId);
+//     if (!doctor) {
+//       return res.status(404).json({ success: false, message: "Doctor not found" });
+//     }
+
+//     // Định dạng kết quả lịch hẹn
+//     const formattedAppointments = appointments.map((app) => {
+//       const slot = doctor.schedule.find((s) => s._id.toString() === app.slotId);
+
+//       return {
+//         _id: app._id,
+//         userData: app.userData,
+//         docData: app.docData,
+//         amount: app.amount,
+//         slotId: app.slotId,
+//         slotDate: slot?.date || app.slotDate,
+//         slotTime: app.slotTime,
+//         startTime: slot?.startTime,
+//         endTime: slot?.endTime,
+//         status: app.status,
+//         bookingDate: app.bookingDate, // ✅ có thể trả về thêm trường này nếu cần
+//         createdAt: app.createdAt,
+//         updatedAt: app.updatedAt
+//       };
+//     });
+
+//     return res.status(200).json({
+//       success: true,
+//       appointments: formattedAppointments,
+//       totalPages: Math.ceil(totalAppointments / limit),
+//       currentPage: page
+//     });
+//   } catch (error) {
+//     console.error('Error fetching doctor appointments:', error);
+//     return res.status(500).json({
+//       success: false,
+//       message: 'Server error while getting doctor appointments.'
+//     });
+//   }
+// };
+// const appointmentsDoctor = async (req, res) => {
+//   try {
+//     const { doctorId } = req.body;
+//     const page = parseInt(req.query.page) || 1;
+
+//     const limit = 7;
+//     const skip = (page - 1) * limit;
+
+//     // Đếm tổng số lịch hẹn
+//     const totalAppointments = await appointmentModel.countDocuments({ docId: doctorId });
+
+//     // Lấy danh sách lịch hẹn theo bookingDate mới nhất
+//     const appointments = await appointmentModel
+//       .find({ docId: doctorId })
+//       .sort({ bookingDate: -1 }) // Sắp xếp theo ngày đặt lịch
+//       .skip(skip)
+//       .limit(limit);
+
+//     // Lấy thông tin bác sĩ
+//     const doctor = await doctorModel.findById(doctorId);
+//     if (!doctor) {
+//       return res.status(404).json({ success: false, message: "Doctor not found" });
+//     }
+
+//     // Định dạng lại lịch hẹn
+//     const formattedAppointments = appointments.map((app) => {
+//       const slot = doctor.schedule.find((s) => s._id.toString() === app.slotId);
+
+//       return {
+//         _id: app._id,
+//         userData: app.userData,
+//         docData: app.docData,
+//         amount: app.amount,
+//         slotId: app.slotId,
+//         slotDate: slot?.date || app.slotDate,
+//         slotTime: app.slotTime,
+//         startTime: slot?.startTime,
+//         endTime: slot?.endTime,
+//         status: app.status,
+//         bookingDate: app.bookingDate,
+//         createdAt: app.createdAt,
+//         updatedAt: app.updatedAt
+//       };
+//     });
+
+//     return res.status(200).json({
+//       success: true,
+//       appointments: formattedAppointments,
+//       totalPages: Math.ceil(totalAppointments / limit),
+//       currentPage: page
+//     });
+//   } catch (error) {
+//     console.error('Error fetching doctor appointments:', error);
+//     return res.status(500).json({
+//       success: false,
+//       message: 'Server error while getting doctor appointments.'
+//     });
+//   }
+// };
 const appointmentsDoctor = async (req, res) => {
-    try {
-      const { doctorId } = req.body;
-  
-      // Lấy danh sách các lịch hẹn theo docId (không phải doctorId)
-      const appointments = await appointmentModel.find({ docId: doctorId }).sort({ createdAt: -1 });
-  
-      // Tìm bác sĩ để lấy lịch làm việc chi tiết
-      const doctor = await doctorModel.findById(doctorId);
-  
-      if (!doctor) {
-        return res.status(404).json({ success: false, message: "Doctor not found" });
-      }
-  
-      const formattedAppointments = appointments.map((app) => {
-        // Tìm lịch cụ thể theo slotId nếu có
-        const slot = doctor.schedule.find(
-          (s) => s._id.toString() === app.slotId
-        );
-  
-        return {
-          _id: app._id,
-          userData: app.userData,
-          docData:app.docData,
-          amount: app.amount,
-          slotId: app.slotId,
-          slotDate: slot?.date || app.slotDate,
-          slotTime: app.slotTime,
-          startTime: slot?.startTime,
-          endTime: slot?.endTime,
-          status: app.status,
-          createdAt: app.createdAt,
-          updatedAt: app.updatedAt
-        };
-      });
-  
-      return res.status(200).json({
-        success: true,
-        appointments: formattedAppointments
-      });
-    } catch (error) {
-      console.error('Error fetching doctor appointments:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Server error while getting doctor appointments.'
-      });
+  try {
+    const { doctorId } = req.body; // doctorId vẫn lấy từ body
+    const page = parseInt(req.query.page) || 1;
+    const status = req.query.status || null;
+
+    const limit = 7;
+    const skip = (page - 1) * limit;
+
+    // Tạo điều kiện truy vấn động
+    const query = { docId: doctorId };
+    if (status && status !== 'all') {
+      query.status = status;
     }
-  };
-  
+
+    // Đếm tổng số lịch hẹn theo filter
+    const totalAppointments = await appointmentModel.countDocuments(query);
+
+    // Lấy danh sách lịch hẹn đã lọc
+    const appointments = await appointmentModel
+      .find(query)
+      .sort({ bookingDate: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    // Lấy thông tin bác sĩ
+    const doctor = await doctorModel.findById(doctorId);
+    if (!doctor) {
+      return res.status(404).json({ success: false, message: "Doctor not found" });
+    }
+
+    // Định dạng lại lịch hẹn
+    const formattedAppointments = appointments.map((app) => {
+      const slot = doctor.schedule.find((s) => s._id.toString() === app.slotId);
+      return {
+        _id: app._id,
+        userData: app.userData,
+        docData: app.docData,
+        amount: app.amount,
+        slotId: app.slotId,
+        slotDate: slot?.date || app.slotDate,
+        slotTime: app.slotTime,
+        startTime: slot?.startTime,
+        endTime: slot?.endTime,
+        status: app.status,
+        bookingDate: app.bookingDate,
+        createdAt: app.createdAt,
+        updatedAt: app.updatedAt
+      };
+    });
+
+    return res.status(200).json({
+      success: true,
+      appointments: formattedAppointments,
+      totalPages: Math.ceil(totalAppointments / limit),
+      currentPage: page
+    });
+  } catch (error) {
+    console.error('Error fetching doctor appointments:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error while getting doctor appointments.'
+    });
+  }
+};
+
 
 //getAppointmentsBySlotId
   const getAppointmentsBySlotId = async (req, res) => {
@@ -318,32 +500,7 @@ const getScheduleDoctorPagination = async (req, res) => {
   }
 };
 
-// const getScheduleDoctorPagination = async (req, res) => {
-//   try {
-//     const { doctorId, page = 1, limit = 7 } = req.body;
 
-//     const doctor = await doctorModel.findById(doctorId).select('schedule');
-//     if (!doctor) {
-//       return res.status(404).json({ success: false, message: 'Doctor not found' });
-//     }
-
-//     const allSchedules = doctor.schedule || [];
-//     const totalSchedules = allSchedules.length;
-//     const totalPages = Math.ceil(totalSchedules / limit);
-//     const startIndex = (page - 1) * limit;
-//     const paginatedSchedules = allSchedules.slice(startIndex, startIndex + limit).reverse();
-
-//     return res.json({
-//       success: true,
-//       schedules: paginatedSchedules,
-//       totalPages,
-//       currentPage: Number(page),
-//     });
-//   } catch (err) {
-//     console.error('Schedule pagination error:', err);
-//     res.status(500).json({ success: false, message: 'Internal Server Error' });
-//   }
-// };
 
 
 //update profile doctor

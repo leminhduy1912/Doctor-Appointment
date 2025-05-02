@@ -30,7 +30,7 @@ const appointmentSchema = new mongoose.Schema({
   slotId: { type: String, required: true }, 
   slotTime: { type: String, required: true },     
   slotDate: { type: String, required: true },     
-  date: { type: Date, default: Date.now },
+  bookingDate: { type: Date, default: Date.now },
   reason:String,
   status: {
     type: String,
