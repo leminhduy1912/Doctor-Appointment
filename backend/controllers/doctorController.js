@@ -246,7 +246,11 @@ const appointmentsDoctor = async (req, res) => {
         status: app.status,
         bookingDate: app.bookingDate,
         createdAt: app.createdAt,
-        updatedAt: app.updatedAt
+        updatedAt: app.updatedAt,
+        linkMeet:app.linkMeet,
+        prescriptionPrescribed:app.prescriptionPrescribed,
+        isDoctorConfirmedComplete:app.isDoctorConfirmedComplete,
+        isUserConfirmedComplete:app.isUserConfirmedComplete
       };
     });
 

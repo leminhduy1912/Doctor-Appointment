@@ -1,3 +1,4 @@
+import { sendRequestConfirmationOfOnlineMedicalExamination } from "../config/mailer.js";
 import appointmentModel from "../models/appointment.model.js";
 
 
@@ -43,5 +44,66 @@ export const updateLinkMeet = async (req, res) => {
       message: 'Internal server error',
       error: error.message,
     });
+  }
+};
+
+
+
+
+const updateAppointmentCompletion = async (appointmentId, role) => {
+  const appointment = await appointmentModel.findById(appointmentId);
+  if (!appointment) throw new Error("Appointment not found");
+
+  if (role === "doctor") appointment.isDoctorConfirmedComplete = true;
+  else if (role === "user") appointment.isUserConfirmedComplete = true;
+
+  // Auto complete if both confirmed
+  if (appointment.isDoctorConfirmedComplete && appointment.isUserConfirmedComplete) {
+    appointment.status = "completed";
+  }
+
+  await appointment.save();
+  return appointment;
+};
+
+
+
+export const doctorConfirmCompletion = async (req, res) => {
+  try {
+    const updatedAppointment = await updateAppointmentCompletion(req.params.id, "doctor");
+
+    // Extract necessary details
+    const {
+      slotDate: date,
+      slotTime: time,
+      slotId,
+      docData: { name: docName, email: emailDoc },
+      userData: { name: patientName, email: to }
+    } = updatedAppointment;
+
+    // Send confirmation email to patient
+    sendRequestConfirmationOfOnlineMedicalExamination(
+      to,
+      date,
+      time,
+      docName,
+      emailDoc,
+      slotId,
+      patientName
+    );
+
+    res.status(200).json({ success: true, message: "Doctor confirmation saved", appointment: updatedAppointment });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+
+export const userConfirmCompletion = async (req, res) => {
+  try {
+    const updatedAppointment = await updateAppointmentCompletion(req.params.id, "user");
+    res.status(200).json({ success: true, message: "User confirmation saved", appointment: updatedAppointment });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
   }
 };

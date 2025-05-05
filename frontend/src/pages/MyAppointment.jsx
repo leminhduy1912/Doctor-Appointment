@@ -416,7 +416,8 @@ const MyAppointments = () => {
 
   const handleVNPAYPayment = async () => {
     try {
-      const payload = { amount: 100000, bankCode: 'NCB', language: 'vn' }
+      const fee = localStorage.getItem("fee");
+      const payload = { amount: fee, bankCode: 'NCB', language: 'vn' }
       const { data } = await axios.post(`${backendUrl}/order/create_payment_url`, payload)
       if (data?.url) window.location.href = data.url
       else toast.error('Failed to initiate payment.')

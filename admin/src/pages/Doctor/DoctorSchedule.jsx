@@ -5,16 +5,24 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Dialog } from '@headlessui/react';
 import Loading from '../../components/Loader';
+import { toast } from 'react-toastify';
 
 const DoctorSchedule = () => {
   const [doctor, setDoctor] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newSlotData, setNewSlotData] = useState({
+    day: '',
+    date: '',
+    startTime: '',
+    endTime: '',
+  });
+  
   useEffect(() => {
     const fetchDoctor = async () => {
       setLoading(true);
@@ -44,12 +52,16 @@ const DoctorSchedule = () => {
     setSelectedSlot(slot);
     setIsModalOpen(true);
   };
-
+  const formatDateToDDMMYYYY = (inputDate) => {
+    const [year, month, day] = inputDate.split('-');
+    return `${day}-${month}-${year}`;
+  };
+  
   const handleConfirmEdit = async () => {
     try {
       const id = localStorage.getItem('id');
       const dToken = localStorage.getItem('dToken');
-
+setLoading(true)
       const payload = {
         doctorId: id,
         day: selectedSlot.day,
@@ -61,13 +73,15 @@ const DoctorSchedule = () => {
         actionType: 'remove',
       };
 
-      await axios.put(`${backendUrl}/api/doctors/update-schedule`, payload, {
+      await axios.post(`${backendUrl}/api/doctor/update-schedule`, payload, {
         headers: { dToken },
       });
 
-      alert('Schedule updated successfully!');
+      //alert('Schedule updated successfully!');
+      toast.success("Your work schedule has been updated !")
       setIsModalOpen(false);
-
+      setLoading(false)
+      // toast.success("Your work schedule has been updated !")
       // Refresh data
       const refreshed = await axios.post(
         `${backendUrl}/api/doctor/get-schedule`,
@@ -76,8 +90,11 @@ const DoctorSchedule = () => {
       );
       setDoctor(refreshed.data.schedules);
     } catch (error) {
+      toast.error("Failed to update schedule !")
+      setLoading(false)
+      setIsModalOpen(false);
       console.error('Error updating schedule:', error);
-      alert('Failed to update schedule.');
+      //alert('Failed to update schedule.');
     }
   };
 
@@ -85,13 +102,23 @@ const DoctorSchedule = () => {
 
   if (!doctor || doctor.length === 0)
     return <p className="text-center text-red-500">No doctor data found.</p>;
-
+console.log(doctor)
   return (
+    <>
+     {loading && <Loading/>}
     <div className="p-6 bg-gray-50 min-h-screen w-full flex items-center justify-center">
       <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg p-6">
         <h2 className="text-2xl font-semibold text-center text-indigo-700 mb-6">
           Doctor's Schedule
         </h2>
+        <div className="flex justify-end mb-4">
+  <button
+    onClick={() => setIsAddModalOpen(true)}
+    className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition"
+  >
+    Add Schedule
+  </button>
+</div>
 
         <div className="overflow-x-auto rounded-lg">
           <table className="w-full table-fixed border-collapse text-sm">
@@ -120,10 +147,17 @@ const DoctorSchedule = () => {
                       className={`font-semibold ${
                         slot.status === 'available'
                           ? 'text-green-600'
+                          : slot.status === 'pending'
+                          ? 'text-yellow-500'
+                          : slot.status === 'waiting for payment'
+                          ? 'text-orange-500'
                           : slot.status === 'booked'
-                          ? 'text-yellow-600'
-                          : 'text-red-600'
+                          ? 'text-blue-600'
+                          : slot.status === 'done'
+                          ? 'text-emerald-600'
+                          : 'text-gray-500'
                       }`}
+                      
                     >
                       {slot.status}
                     </span>
@@ -202,7 +236,112 @@ const DoctorSchedule = () => {
           </Dialog.Panel>
         </div>
       </Dialog>
+      {/* // add schedule modal */}
+      <Dialog open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} className="relative z-50">
+  <div className="fixed inset-0 bg-black/50" aria-hidden="true" />
+  <div className="fixed inset-0 flex items-center justify-center p-4">
+    <Dialog.Panel className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+      <Dialog.Title className="text-lg font-bold text-green-600 mb-4">
+        Add New Schedule
+      </Dialog.Title>
+
+      <div className="space-y-4">
+        <div>
+          <label className="block text-gray-700 mb-1">Date</label>
+          <input
+            type="date"
+            value={newSlotData.date}
+            onChange={(e) => {
+              const selectedDate = e.target.value;
+              const dayOfWeek = new Date(selectedDate).toLocaleDateString('en-US', {
+                weekday: 'long',
+              });
+              setNewSlotData({ ...newSlotData, date: selectedDate, day: dayOfWeek });
+            }}
+            className="w-full border px-4 py-2 rounded-lg"
+          />
+        </div>
+
+        <div>
+          <label className="block text-gray-700 mb-1">Start Time</label>
+          <input
+            type="time"
+            value={newSlotData.startTime}
+            onChange={(e) => setNewSlotData({ ...newSlotData, startTime: e.target.value })}
+            className="w-full border px-4 py-2 rounded-lg"
+          />
+        </div>
+
+        <div>
+          <label className="block text-gray-700 mb-1">End Time</label>
+          <input
+            type="time"
+            value={newSlotData.endTime}
+            onChange={(e) => setNewSlotData({ ...newSlotData, endTime: e.target.value })}
+            className="w-full border px-4 py-2 rounded-lg"
+          />
+        </div>
+      </div>
+
+      <div className="mt-6 flex justify-end gap-4">
+        <button
+          onClick={() => setIsAddModalOpen(false)}
+          className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={async () => {
+            try {
+              const id = localStorage.getItem('id');
+              const dToken = localStorage.getItem('dToken');
+              setLoading(true);
+
+              const payload = {
+                doctorId: id,
+                day: newSlotData.day,
+                date: formatDateToDDMMYYYY(newSlotData.date),
+                newSlot: {
+                  startTime: newSlotData.startTime,
+                  endTime: newSlotData.endTime,
+                },
+                actionType: 'add',
+              };
+
+              await axios.post(`${backendUrl}/api/doctor/update-schedule`, payload, {
+                headers: { dToken },
+              });
+
+              toast.success('New schedule added!');
+              setIsAddModalOpen(false);
+
+              // refresh data
+              const refreshed = await axios.post(
+                `${backendUrl}/api/doctor/get-schedule`,
+                { doctorId: id, page: currentPage, limit: 7 },
+                { headers: { dToken } }
+              );
+              setDoctor(refreshed.data.schedules);
+            } catch (error) {
+              toast.error('The working hours you add coincide with the existing working hours, please select a different time frame !');
+              console.error(error);
+            } finally {
+              setLoading(false);
+            }
+          }}
+          className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+        >
+          Save
+        </button>
+      </div>
+    </Dialog.Panel>
+  </div>
+</Dialog>
+
     </div>
+    </>
+ 
+
   );
 };
 

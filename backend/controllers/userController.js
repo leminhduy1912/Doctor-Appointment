@@ -5,7 +5,7 @@ import userModel from "../models/user.model.js";
 import {v2 as cloudinary} from "cloudinary"
 import doctorModel from "../models/doctor.model.js";
 import appointmentModel from "../models/appointment.model.js";
-import { sendConfirmationCancelScheduleFromUserToDoctor, sendConfirmationScheduleToDoctor, sendConfirmationScheduleToUser, sendNotiNewBookingToDoctor } from "../config/mailer.js";
+import { sendConfirmationBookingAndPaymentRequestToUser, sendConfirmationCancelScheduleFromUserToDoctor, sendConfirmationScheduleToDoctor, sendConfirmationScheduleToUser, sendNotiNewBookingToDoctor } from "../config/mailer.js";
 import mongoose from "mongoose";
 // API to register user
 const registerUser = async (req, res) => {
@@ -386,6 +386,7 @@ const getAllAppointments = async (req, res) => {
             const docName = doctor.name;
             const emailDoc = doctor.email;
             const linkMeet = `${process.env.VIDEO_CALL_SERVER}/` + randomString;
+            console.log(linkMeet)
             const patientName = app.userData?.name || "Patient";
             const patientEmail = app.userData?.email || "patient@example.com";
       
@@ -429,8 +430,13 @@ const getAllAppointments = async (req, res) => {
               createdAt: app.createdAt,
               updatedAt: app.updatedAt
             });
+            await appointmentModel.updateOne(
+              { _id: app._id },
+              { $set: { linkMeet: linkMeet } }
+            );
           }
-      
+      console.log(formattedAppointments)
+    
           return res.status(200).json({
             success: true,
             appointments: formattedAppointments
