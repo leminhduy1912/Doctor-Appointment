@@ -1,7 +1,7 @@
 import express from "express";
 import { createMedicalRecord, findMedicalRecordByAppointmentId } from "../controllers/medicalRecordController.js";
 import authDoctor from "../middlewares/authDoctor.js";
-
+import authUser from "../middlewares/authUser.js"
 const medicalRecordRouter = express.Router();
 
 medicalRecordRouter.post("/",authDoctor, createMedicalRecord);

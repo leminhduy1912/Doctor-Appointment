@@ -1,6 +1,8 @@
 import medicalRecordModel from "../models/medicalRecord.model.js";
 import appointmentModel from "../models/appointment.model.js";
+import { sendPrescriptionNotificationToUser } from "../config/mailer.js";
 
+// 
 export const createMedicalRecord = async (req, res) => {
   try {
     const {
@@ -14,6 +16,7 @@ export const createMedicalRecord = async (req, res) => {
       allergies,
     } = req.body;
 
+    // Tạo hồ sơ bệnh án mới
     const newMedicalRecord = new medicalRecordModel({
       patientId,
       doctorId,
@@ -27,13 +30,37 @@ export const createMedicalRecord = async (req, res) => {
 
     const savedRecord = await newMedicalRecord.save();
 
-    // Cập nhật appointment -> prescriptionPrescribed = true
+    // Cập nhật trạng thái đơn thuốc đã kê cho cuộc hẹn
+    let appointmentData;
     if (appointmentId) {
-      await appointmentModel.findByIdAndUpdate(
+      appointmentData = await appointmentModel.findByIdAndUpdate(
         appointmentId,
         { prescriptionPrescribed: true },
         { new: true }
       );
+    }
+console.log("data",appointmentData)
+    // Nếu có đủ dữ liệu từ cuộc hẹn -> gửi email thông báo
+    if (appointmentData) {
+      const to = appointmentData.userData.email;
+      const patientName = appointmentData.userData.name;
+      const docName = appointmentData.docData.name;
+      const emailDoc = appointmentData.docData.email;
+      const slotId = appointmentData.slotId;
+      const date = appointmentData.slotDate;
+      const time = appointmentData.slotTime;
+
+     
+        await sendPrescriptionNotificationToUser(
+          to,
+          date,
+          time,
+          docName,
+          emailDoc,
+          slotId,
+          patientName
+        );
+      
     }
 
     res.status(201).json({
@@ -42,9 +69,55 @@ export const createMedicalRecord = async (req, res) => {
     });
   } catch (error) {
     console.error("Error creating medical record:", error);
-    res.status(500).json({ message: "Server error while creating medical record" });
+    res
+      .status(500)
+      .json({ message: "Server error while creating medical record" });
   }
 };
+//   try {
+//     const {
+//       patientId,
+//       doctorId,
+//       appointmentId,
+//       diagnosis,
+//       prescriptions,
+//       notes,
+//       medicalHistory,
+//       allergies,
+//     } = req.body;
+
+//     const newMedicalRecord = new medicalRecordModel({
+//       patientId,
+//       doctorId,
+//       appointmentId,
+//       diagnosis,
+//       prescriptions,
+//       notes,
+//       medicalHistory,
+//       allergies,
+//     });
+
+//     const savedRecord = await newMedicalRecord.save();
+
+//     // Cập nhật appointment -> prescriptionPrescribed = true
+//     if (appointmentId) {
+//       await appointmentModel.findByIdAndUpdate(
+//         appointmentId,
+//         { prescriptionPrescribed: true },
+//         { new: true }
+//       );
+//     }
+//     await sendPrescriptionNotificationToUser(to,date,time,docName,emailDoc,slotId,patientName);
+
+//     res.status(201).json({
+//       message: "Medical record created successfully",
+//       medicalRecord: savedRecord,
+//     });
+//   } catch (error) {
+//     console.error("Error creating medical record:", error);
+//     res.status(500).json({ message: "Server error while creating medical record" });
+//   }
+// };
 export const findMedicalRecordByAppointmentId = async (req, res) => {
   try {
     const { appointmentId } = req.params;

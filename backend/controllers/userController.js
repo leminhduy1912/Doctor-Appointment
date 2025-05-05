@@ -224,14 +224,77 @@ const isUserExist = async (req, res) => {
 
   
 
+// const getAllAppointments = async (req, res) => {
+//   try {
+//     const userId = req.body.userId;
+//     const { page = 1, limit = 10, status } = req.query;
+
+//     // Xây điều kiện tìm kiếm
+//     const query = { userId };
+//     if (status && status !== 'all') {
+//       query.status = status;
+//     }
+
+//     const skip = (parseInt(page) - 1) * parseInt(limit);
+
+//     // Đếm tổng số lịch hẹn phù hợp
+//     const totalAppointments = await appointmentModel.countDocuments(query);
+
+//     // Lấy danh sách lịch hẹn có phân trang
+//     const appointments = await appointmentModel
+//       .find(query)
+//       .sort({ createdAt: -1 })
+//       .skip(skip)
+//       .limit(parseInt(limit));
+
+//     // Format dữ liệu trả về
+//     const formattedAppointments = appointments.map(app => ({
+//       _id: app._id,
+//       userData: app.userData,
+//       docData: app.docData,
+//       amount: app.amount,
+//       slotId: app.slotId,
+//       slotTime: app.slotTime,
+//       slotDate: app.slotDate,
+//       bookingDate: app.date,
+//       status: app.status,
+//       createdAt: app.createdAt,
+//       updatedAt: app.updatedAt,
+//       linkMeet: app.linkMeet,
+//       reason: app.reason,
+//     }));
+
+//     return res.status(200).json({
+//       success: true,
+//       appointments: formattedAppointments,
+//       total: totalAppointments,
+//       currentPage: parseInt(page),
+//       totalPages: Math.ceil(totalAppointments / limit),
+//     });
+//   } catch (error) {
+//     console.error('Error fetching appointments:', error);
+//     return res.status(500).json({
+//       success: false,
+//       message: 'Server error while getting appointments.'
+//     });
+//   }
+// };
+
 const getAllAppointments = async (req, res) => {
   try {
     const userId = req.body.userId;
-    const { page = 1, limit = 10, status } = req.query;
+    const { page = 1, limit = 10, status = 'all' } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing userId in request body.",
+      });
+    }
 
     // Xây điều kiện tìm kiếm
     const query = { userId };
-    if (status && status !== 'all') {
+    if (status !== 'all') {
       query.status = status;
     }
 
@@ -256,12 +319,13 @@ const getAllAppointments = async (req, res) => {
       slotId: app.slotId,
       slotTime: app.slotTime,
       slotDate: app.slotDate,
-      bookingDate: app.date,
+      bookingDate: app.bookingDate,
       status: app.status,
       createdAt: app.createdAt,
       updatedAt: app.updatedAt,
       linkMeet: app.linkMeet,
       reason: app.reason,
+      prescriptionPrescribed:app.prescriptionPrescribed
     }));
 
     return res.status(200).json({
@@ -272,14 +336,13 @@ const getAllAppointments = async (req, res) => {
       totalPages: Math.ceil(totalAppointments / limit),
     });
   } catch (error) {
-    console.error('Error fetching appointments:', error);
+    console.error("Error fetching appointments:", error);
     return res.status(500).json({
       success: false,
-      message: 'Server error while getting appointments.'
+      message: "Server error while getting appointments.",
     });
   }
 };
-
 
 
   const updateSlotStatus = async (req, res) => {
