@@ -1034,6 +1034,7 @@ import toast from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 import { AppContext } from '../context/AppContext';
+import Loading from '../components/Loader';
 
 export default function Appointment() {
   const { docId } = useParams();
@@ -1048,24 +1049,7 @@ export default function Appointment() {
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Lấy thông tin bác sĩ
-  // useEffect(() => {
-  //   const doctor = doctors.find((d) => d._id === docId);
-  //   setDocInfo(doctor);
 
-  //   if (doctor?.schedule?.length > 0) {
-  //     const today = new Date();
-  //     const upcoming = doctor.schedule
-  //       .filter(
-  //         (s) =>
-  //           s.status === 'available' &&
-  //           new Date(convertDate(s.date)) >= today
-  //       )
-  //       .map((s) => s.date);
-
-  //     setAvailableDates([...new Set(upcoming)]);
-  //   }
-  // }, [doctors, docId]);
 
   useEffect(() => {
     const doctor = doctors.find((d) => d._id === docId);
@@ -1128,8 +1112,10 @@ export default function Appointment() {
       if (res.data.success) {
         toast.success(res.data.message);
         navigate('/my-appointments');
+        toast.success("Booked successfully !")
       } else {
         toast.error(res.data.message);
+        toast.error("Booked failed !")
       }
     } catch (err) {
       toast.error(err?.response?.data?.message || 'Error booking appointment');
@@ -1140,6 +1126,8 @@ export default function Appointment() {
   };
 console.log(availableDates)
   return (
+    <>
+    {isLoading && <Loading/>}
     <div className="max-w-4xl mx-auto px-4 py-10">
       <h1 className="text-2xl font-bold mb-6">Book Appointment</h1>
 
@@ -1254,5 +1242,7 @@ console.log(availableDates)
         </Dialog>
       </Transition>
     </div>
+    </>
+ 
   );
 }

@@ -1350,11 +1350,16 @@ const DoctorAppointments = () => {
   };
 
   // Modal handlers
-  const openModal = (type, item) => {
+  // const openModal = (type, item) => {
+  //   setModalType(type);
+  //   setSelectedItem(item);
+  //   setModalVisible(true);
+  // };
+  const openModal = React.useCallback((type, item) => {
     setModalType(type);
     setSelectedItem(item);
     setModalVisible(true);
-  };
+  }, []);
 
   const handleOpenPrescriptionModal = (appointment) => {
     setSelectedAppointment(appointment);
@@ -1365,8 +1370,10 @@ const DoctorAppointments = () => {
     if (!selectedItem) return;
 
     if (modalType === "join") {
+      console.log("link",selectedItem.linkMeet)
       window.open(selectedItem.linkMeet, "_blank");
     } else if (modalType === "request") {
+      console.log("request",selectedItem._id)
       handleRequestConfirmation(selectedItem._id);
     }
 
@@ -1461,7 +1468,7 @@ const DoctorAppointments = () => {
                   </div>
                 )}
 
-                {filterStatus === "booked" && item.status === "booked" && (
+                {/* {filterStatus === "booked" && item.status === "booked" && (
                   <div className="relative inline-block text-left">
                     <Menu as="div" className="relative inline-block text-left">
                       <Menu.Button className="p-1 rounded hover:bg-gray-100">
@@ -1481,7 +1488,10 @@ const DoctorAppointments = () => {
                             <Menu.Item>
                               {({ active }) => (
                                 <button
-                                  onClick={() => openModal("join", item)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openModal("join", item);
+                                }}
                                   className={`${active ? "bg-gray-100" : ""} text-gray-900 block w-full text-left px-4 py-2 text-sm`}
                                 >
                                   Join Room
@@ -1503,7 +1513,58 @@ const DoctorAppointments = () => {
                       </Transition>
                     </Menu>
                   </div>
-                )}
+                )} */}
+                {filterStatus === "booked" && item.status === "booked" && (
+                  <div className="flex justify-center gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openModal("join", item);
+                    }}
+                    className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors shadow-sm"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <span className="hidden sm:inline">Join</span>
+                  </button>
+                  
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openModal("request", item);
+                    }}
+                    className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors shadow-sm"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="hidden sm:inline">Confirm</span>
+                  </button>
+                </div>
+  // <div className="relative inline-block text-left">
+  //    <button
+  //                 onClick={(e) => {
+  //                   e.stopPropagation();
+  //                   openModal("join", item);
+  //                 }}
+  //                 className={`${  'text-gray-700'} block w-full px-4 py-2 text-left text-sm`}
+  //               >
+  //                 Join Room
+  //               </button>
+
+  //               <button
+  //                 onClick={(e) => {
+  //                   e.stopPropagation();
+  //                   openModal("request", item);
+  //                 }}
+  //                 className={`'text-gray-700'} block w-full px-4 py-2 text-left text-sm`}
+  //               >
+  //                 Request Confirmation
+  //               </button>
+
+  // </div>
+)}
 
                 {filterStatus === "completed" && item.status === "completed" && (
                   <div className="relative inline-block text-left">

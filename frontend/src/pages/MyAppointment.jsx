@@ -706,7 +706,8 @@ const MyAppointments = () => {
   const [joinModal, setJoinModal] = useState({ open: false, link: null });
 const [showViewPrescriptionModal,setShowViewPrescriptionModal] = useState(false)
 const [selectedPrescription, setSelectedPrescription] = useState(null);
-
+const [showSendRequestConfirmationModal, setSendRequestShowConfirmationModal] = useState(false);
+const [selectedItemToSendConfirmToDoctor,setSelectedItemToSendConfirmToDoctor] = useState(null)
   const getUserAppointments = async () => {
     try {
       setIsLoading(true);
@@ -799,7 +800,31 @@ const handleViewPrescription = (item) => {
   
   setShowViewPrescriptionModal(true);
 };
-console.log(selectedPrescription)
+
+
+const handleSendConfirmationRequestToDoctor =(item)=>{
+  setSendRequestShowConfirmationModal(true)
+  setSelectedItemToSendConfirmToDoctor(item)
+}
+
+const handleCallApiConfirmationRequestToDoctor = async ()=>{
+  setIsLoading(true)
+  try {
+    setIsLoading(true);
+    const response = await axios.put(
+      `${backendUrl}/api/appointment/${selectedItemToSendConfirmToDoctor._id}/confirm-user`,
+      {},
+      { headers: { token } }
+    );
+    
+    toast.success(response.data.message || 'Confirmation sent successfully!');
+    setSendRequestShowConfirmationModal(false);
+  } catch (error) {
+    toast.error(error.response?.data?.message || 'Failed to send confirmation');
+  } finally {
+    setIsLoading(false);
+  }
+}
   return (
     <div>
       {isLoading && <Loading />}
@@ -863,11 +888,15 @@ console.log(selectedPrescription)
       >
         Join Room
       </button>
-      <button
-        className='sm:min-w-48 py-2 border rounded text-[#696969] hover:bg-green-600 hover:text-white transition-all duration-300'
-      >
-        Send done confirmation
-      </button>
+      {item.isDoctorConfirmedComplete == true &&(
+ <button
+ onClick={() => handleSendConfirmationRequestToDoctor(item) }
+ className='sm:min-w-48 py-2 border rounded text-[#696969] hover:bg-green-600 hover:text-white transition-all duration-300'
+>
+ Send done confirmation
+</button>
+      )}
+     
     </>
   )}
 {item.status === "completed" && item.prescriptionPrescribed === true && (
@@ -878,18 +907,18 @@ console.log(selectedPrescription)
     View prescription
   </button>
 )}
+{item.status === "completed" && item.prescriptionPrescribed === false && (
+  <p
+    className='sm:min-w-48 py-2 border rounded text-[#696969] bg-blue-600 text-white transition-all duration-300'
+    //onClick={() => handleViewPrescription(item)}
+  >
+    Pending prescription
+  </p>
+)}
 
 
 
-  {/* Nút Cancel chỉ hiển thị khi status không phải là "completed", "cancelled", hoặc "booked" */}
-  {/* {item.status !== "completed" && item.status !== "cancelled" && item.status !== "booked" && (
-    <button
-      onClick={() => setConfirmModal({ open: true, id: item._id, doctorId: item.docData._id })}
-      className='sm:min-w-48 py-2 border rounded text-[#696969] hover:bg-red-600 hover:text-white transition-all duration-300'
-    >
-      Cancel appointment
-    </button>
-  )} */}
+
 
 
 {!["cancelled", "booked", "completed"].includes(item.status) && (
@@ -1053,6 +1082,33 @@ console.log(selectedPrescription)
           </motion.div>
         )}
       </AnimatePresence>
+
+       {/* Confirmation Modal */}
+       {showSendRequestConfirmationModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full">
+            <h3 className="text-lg font-semibold mb-4">Confirm Action</h3>
+            <p className="mb-6">Are you sure you want to send the completion confirmation?</p>
+            
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setSendRequestShowConfirmationModal(false)}
+                className="px-4 py-2 border rounded text-gray-700 hover:bg-gray-100 transition-colors"
+                disabled={isLoading}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCallApiConfirmationRequestToDoctor}
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Sending...' : 'Confirm'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

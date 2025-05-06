@@ -65,7 +65,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { AppContext } from '../context/AppContext'
 import { useNavigate, useParams } from 'react-router-dom'
 
-const ITEMS_PER_PAGE = 1
+const ITEMS_PER_PAGE = 4
 
 const Doctors = () => {
   const { speciality } = useParams()
@@ -165,7 +165,7 @@ const Doctors = () => {
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {totalPages >= 1 && (
         <div className='flex justify-center mt-6 gap-2'>
           {Array.from({ length: totalPages }).map((_, i) => (
             <button

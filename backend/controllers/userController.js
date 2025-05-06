@@ -325,7 +325,9 @@ const getAllAppointments = async (req, res) => {
       updatedAt: app.updatedAt,
       linkMeet: app.linkMeet,
       reason: app.reason,
-      prescriptionPrescribed:app.prescriptionPrescribed
+      prescriptionPrescribed:app.prescriptionPrescribed,
+      isDoctorConfirmedComplete:app.isDoctorConfirmedComplete,
+      isUserConfirmedComplete:app.isUserConfirmedComplete
     }));
 
     return res.status(200).json({
