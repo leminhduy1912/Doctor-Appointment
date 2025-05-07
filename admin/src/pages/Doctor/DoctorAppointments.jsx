@@ -1542,28 +1542,7 @@ const DoctorAppointments = () => {
                     <span className="hidden sm:inline">Confirm</span>
                   </button>
                 </div>
-  // <div className="relative inline-block text-left">
-  //    <button
-  //                 onClick={(e) => {
-  //                   e.stopPropagation();
-  //                   openModal("join", item);
-  //                 }}
-  //                 className={`${  'text-gray-700'} block w-full px-4 py-2 text-left text-sm`}
-  //               >
-  //                 Join Room
-  //               </button>
-
-  //               <button
-  //                 onClick={(e) => {
-  //                   e.stopPropagation();
-  //                   openModal("request", item);
-  //                 }}
-  //                 className={`'text-gray-700'} block w-full px-4 py-2 text-left text-sm`}
-  //               >
-  //                 Request Confirmation
-  //               </button>
-
-  // </div>
+  
 )}
 
                 {filterStatus === "completed" && item.status === "completed" && (

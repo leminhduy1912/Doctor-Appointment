@@ -4,6 +4,7 @@ import doctorModel from '../models/doctor.model.js'
 import validator from 'validator'
 import bcrypt from 'bcrypt'
 import { v2 as cloudinary } from "cloudinary";
+import { sendActivateFromAdminToDoctor, sendDeactivateFromAdminToDoctor } from '../config/mailer.js'
 // API for admin login
 const loginAdmin = async (req, res) => {
     try {
@@ -54,17 +55,39 @@ const appointmentCancel = async (req, res) => {
 }
 
 // API to get all doctors list for admin panel
-const allDoctors = async (req, res) => {
+const getDoctorList = async (req, res) => {
     try {
+        const { speciality, page = 1, limit = 10 } = req.query;
 
-        const doctors = await doctorModel.find({}).select('-password')
-        res.json({ success: true, doctors })
+        const filter = {};
+        if (speciality && speciality !== "All") {
+            filter.speciality = speciality;
+        }
 
+        const skip = (Number(page) - 1) * Number(limit);
+
+        const doctors = await doctorModel
+            .find(filter)
+            .select("-password")
+            .skip(skip)
+            .limit(Number(limit))
+            .sort({ createdAt: -1 });
+
+        const total = await doctorModel.countDocuments(filter);
+
+        res.json({
+            success: true,
+            doctors,
+            total,
+            page: Number(page),
+            totalPages: Math.ceil(total / limit),
+        });
     } catch (error) {
-        console.log(error)
-        res.json({ success: false, message: error.message })
+        console.error("Error fetching doctors:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
     }
-}
+};
+
 
 const addDoctor = async (req, res) => {
     try {
@@ -166,11 +189,37 @@ const adminDashboard = async (req, res) => {
         res.json({ success: false, message: error.message })
     }
 }
+
+const updateStatusDoctor = async (req, res) => {
+    try {
+        const { docId,reason } = req.body;
+
+        const doctor = await doctorModel.findById(docId).select("-password");
+        console.log("doc",docId)
+        if (!doctor) {
+            return res.json({ success: false, message: "Doctor not found" });
+        }
+if (doctor.available){
+    await sendDeactivateFromAdminToDoctor(doctor.email,doctor.name,reason);
+} else {
+    sendActivateFromAdminToDoctor(doctor.email,doctor.name)
+}
+        doctor.available = !doctor.available;
+        await doctor.save();
+
+        res.json({ success: true, message: "Availability Changed", available: doctor.available });
+
+    } catch (error) {
+        console.error("Error changing availability:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+};
 export {
     loginAdmin,
     appointmentsAdmin,
     appointmentCancel,
     addDoctor,
-    allDoctors,
-    adminDashboard
+    getDoctorList,
+    adminDashboard,
+    updateStatusDoctor
 }

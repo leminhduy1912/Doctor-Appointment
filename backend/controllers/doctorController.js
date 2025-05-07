@@ -16,7 +16,9 @@ const loginDoctor = async (req, res) => {
         if (!user) {
             return res.json({ success: false, message: "Invalid credentials" })
         }
-
+        if (!user.available) {
+          return res.json({ success: false, message: "Your account is unavailable" })
+      }
         const isMatch = await bcrypt.compare(password, user.password)
 
         if (isMatch) {
@@ -420,21 +422,58 @@ const appointmentCancel = async (req, res) => {
 // };
 
 //get doctor list
+// const getDoctorList = async (req, res) => {
+//     try {
+//         const doctors = await doctorModel.find({}).select("-password");
+//         res.json({ success: true, doctors });
+//     } catch (error) {
+//         console.error("Error fetching doctors:", error);
+//         res.status(500).json({ success: false, message: "Internal Server Error" });
+//     }
+// };
+
+
 const getDoctorList = async (req, res) => {
-    try {
-        const doctors = await doctorModel.find({}).select("-password");
-        res.json({ success: true, doctors });
-    } catch (error) {
-        console.error("Error fetching doctors:", error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
-    }
+  try {
+      const { speciality, page = 1, limit = 10 } = req.query;
+
+      const filter = {};
+      if (speciality) {
+          filter.speciality = speciality;
+      }
+
+      const skip = (Number(page) - 1) * Number(limit);
+
+      const doctors = await doctorModel
+          .find(filter)
+          .select("-password")
+          .skip(skip)
+          .limit(Number(limit))
+          .sort({ createdAt: -1 }); // sắp xếp mới nhất trước
+
+      const total = await doctorModel.countDocuments(filter);
+
+      res.json({
+          success: true,
+          doctors,
+          total,
+          page: Number(page),
+          totalPages: Math.ceil(total / limit),
+      });
+  } catch (error) {
+      console.error("Error fetching doctors:", error);
+      res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
 };
+
+
 //update status doctor
 const updateStatus = async (req, res) => {
     try {
-        const { doctorId } = req.body;
+        const { docId } = req.body;
 
-        const doctor = await doctorModel.findById(doctorId);
+        const doctor = await doctorModel.findById(docId).select("-password");
+        console.log("doc",docId)
         if (!doctor) {
             return res.json({ success: false, message: "Doctor not found" });
         }
