@@ -1349,12 +1349,7 @@ const DoctorAppointments = () => {
     }
   };
 
-  // Modal handlers
-  // const openModal = (type, item) => {
-  //   setModalType(type);
-  //   setSelectedItem(item);
-  //   setModalVisible(true);
-  // };
+
   const openModal = React.useCallback((type, item) => {
     setModalType(type);
     setSelectedItem(item);
@@ -1468,52 +1463,6 @@ const DoctorAppointments = () => {
                   </div>
                 )}
 
-                {/* {filterStatus === "booked" && item.status === "booked" && (
-                  <div className="relative inline-block text-left">
-                    <Menu as="div" className="relative inline-block text-left">
-                      <Menu.Button className="p-1 rounded hover:bg-gray-100">
-                        <HiOutlineDotsVertical className="w-5 h-5 text-gray-600" />
-                      </Menu.Button>
-                      <Transition
-                        as={Fragment}
-                        enter="transition ease-out duration-100"
-                        enterFrom="transform opacity-0 scale-95"
-                        enterTo="transform opacity-100 scale-100"
-                        leave="transition ease-in duration-75"
-                        leaveFrom="transform opacity-100 scale-100"
-                        leaveTo="transform opacity-0 scale-95"
-                      >
-                        <Menu.Items className="absolute right-0 top-0 z-50 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                          <div className="py-1">
-                            <Menu.Item>
-                              {({ active }) => (
-                                <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  openModal("join", item);
-                                }}
-                                  className={`${active ? "bg-gray-100" : ""} text-gray-900 block w-full text-left px-4 py-2 text-sm`}
-                                >
-                                  Join Room
-                                </button>
-                              )}
-                            </Menu.Item>
-                            <Menu.Item>
-                              {({ active }) => (
-                                <button
-                                  onClick={() => openModal("request", item)}
-                                  className={`${active ? "bg-gray-100" : ""} text-gray-900 block w-full text-left px-4 py-2 text-sm`}
-                                >
-                                  Request Confirmation
-                                </button>
-                              )}
-                            </Menu.Item>
-                          </div>
-                        </Menu.Items>
-                      </Transition>
-                    </Menu>
-                  </div>
-                )} */}
                 {filterStatus === "booked" && item.status === "booked" && (
                   <div className="flex justify-center gap-2">
                   <button

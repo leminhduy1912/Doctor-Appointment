@@ -107,3 +107,30 @@ export const userConfirmCompletion = async (req, res) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
+
+
+
+
+export const getAllAppointments= async (req, res) => {
+  try {
+    const { status = "all", page = 1, limit = 10 } = req.query;
+
+    const query = status === "all" ? {} : { status };
+
+    const skip = (page - 1) * limit;
+
+    const [appointments, total] = await Promise.all([
+      appointmentModel.find(query).sort({ createdAt: -1 }).skip(skip).limit(Number(limit)),
+      appointmentModel.countDocuments(query),
+    ]);
+
+    res.status(200).json({
+      data: appointments,
+      total,
+      page: Number(page),
+      totalPages: Math.ceil(total / limit),
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi server khi lấy danh sách cuộc hẹn", error });
+  }
+}

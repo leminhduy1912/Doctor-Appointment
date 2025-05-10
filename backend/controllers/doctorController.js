@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import appointmentModel from "../models/appointment.model.js";
 import { sendConfirmationBookingAndPaymentRequestToUser, sendConfirmationCancelScheduleFromDoctorToUser, sendConfirmationScheduleToDoctor, sendConfirmationScheduleToUser } from "../config/mailer.js";
 import mongoose from "mongoose";
-import moment from'moment'
+
 // API for doctor Login 
 const loginDoctor = async (req, res) => {
 
@@ -35,172 +35,6 @@ const loginDoctor = async (req, res) => {
     }
 }
 
-// API to get doctor appointments for doctor panel
-// const appointmentsDoctor = async (req, res) => {
-//     try {
-//       const { doctorId } = req.body;
-  
-//       // Lấy danh sách các lịch hẹn theo docId (không phải doctorId)
-//       const appointments = await appointmentModel.find({ docId: doctorId }).sort({ createdAt: -1 });
-  
-//       // Tìm bác sĩ để lấy lịch làm việc chi tiết
-//       const doctor = await doctorModel.findById(doctorId);
-  
-//       if (!doctor) {
-//         return res.status(404).json({ success: false, message: "Doctor not found" });
-//       }
-  
-//       const formattedAppointments = appointments.map((app) => {
-//         // Tìm lịch cụ thể theo slotId nếu có
-//         const slot = doctor.schedule.find(
-//           (s) => s._id.toString() === app.slotId
-//         );
-  
-//         return {
-//           _id: app._id,
-//           userData: app.userData,
-//           docData:app.docData,
-//           amount: app.amount,
-//           slotId: app.slotId,
-//           slotDate: slot?.date || app.slotDate,
-//           slotTime: app.slotTime,
-//           startTime: slot?.startTime,
-//           endTime: slot?.endTime,
-//           status: app.status,
-//           createdAt: app.createdAt,
-//           updatedAt: app.updatedAt
-//         };
-//       });
-  
-//       return res.status(200).json({
-//         success: true,
-//         appointments: formattedAppointments
-//       });
-//     } catch (error) {
-//       console.error('Error fetching doctor appointments:', error);
-//       return res.status(500).json({
-//         success: false,
-//         message: 'Server error while getting doctor appointments.'
-//       });
-//     }
-//   };
-// const appointmentsDoctor = async (req, res) => {
-//   try {
-//     const { doctorId } = req.body;
-//     const page = parseInt(req.query.page) || 1;
-//     const limit = 7;
-//     const skip = (page - 1) * limit;
-
-//     // Đếm tổng số lịch hẹn
-//     const totalAppointments = await appointmentModel.countDocuments({ docId: doctorId });
-
-//     // Lấy danh sách lịch hẹn có phân trang và sắp xếp theo bookingDate mới nhất
-//     const appointments = await appointmentModel
-//       .find({ docId: doctorId })
-//       .sort({ bookingDate: -1 }) // ✅ Sắp xếp theo bookingDate
-//       .skip(skip)
-//       .limit(limit);
-
-//     // Lấy thông tin bác sĩ
-//     const doctor = await doctorModel.findById(doctorId);
-//     if (!doctor) {
-//       return res.status(404).json({ success: false, message: "Doctor not found" });
-//     }
-
-//     // Định dạng kết quả lịch hẹn
-//     const formattedAppointments = appointments.map((app) => {
-//       const slot = doctor.schedule.find((s) => s._id.toString() === app.slotId);
-
-//       return {
-//         _id: app._id,
-//         userData: app.userData,
-//         docData: app.docData,
-//         amount: app.amount,
-//         slotId: app.slotId,
-//         slotDate: slot?.date || app.slotDate,
-//         slotTime: app.slotTime,
-//         startTime: slot?.startTime,
-//         endTime: slot?.endTime,
-//         status: app.status,
-//         bookingDate: app.bookingDate, // ✅ có thể trả về thêm trường này nếu cần
-//         createdAt: app.createdAt,
-//         updatedAt: app.updatedAt
-//       };
-//     });
-
-//     return res.status(200).json({
-//       success: true,
-//       appointments: formattedAppointments,
-//       totalPages: Math.ceil(totalAppointments / limit),
-//       currentPage: page
-//     });
-//   } catch (error) {
-//     console.error('Error fetching doctor appointments:', error);
-//     return res.status(500).json({
-//       success: false,
-//       message: 'Server error while getting doctor appointments.'
-//     });
-//   }
-// };
-// const appointmentsDoctor = async (req, res) => {
-//   try {
-//     const { doctorId } = req.body;
-//     const page = parseInt(req.query.page) || 1;
-
-//     const limit = 7;
-//     const skip = (page - 1) * limit;
-
-//     // Đếm tổng số lịch hẹn
-//     const totalAppointments = await appointmentModel.countDocuments({ docId: doctorId });
-
-//     // Lấy danh sách lịch hẹn theo bookingDate mới nhất
-//     const appointments = await appointmentModel
-//       .find({ docId: doctorId })
-//       .sort({ bookingDate: -1 }) // Sắp xếp theo ngày đặt lịch
-//       .skip(skip)
-//       .limit(limit);
-
-//     // Lấy thông tin bác sĩ
-//     const doctor = await doctorModel.findById(doctorId);
-//     if (!doctor) {
-//       return res.status(404).json({ success: false, message: "Doctor not found" });
-//     }
-
-//     // Định dạng lại lịch hẹn
-//     const formattedAppointments = appointments.map((app) => {
-//       const slot = doctor.schedule.find((s) => s._id.toString() === app.slotId);
-
-//       return {
-//         _id: app._id,
-//         userData: app.userData,
-//         docData: app.docData,
-//         amount: app.amount,
-//         slotId: app.slotId,
-//         slotDate: slot?.date || app.slotDate,
-//         slotTime: app.slotTime,
-//         startTime: slot?.startTime,
-//         endTime: slot?.endTime,
-//         status: app.status,
-//         bookingDate: app.bookingDate,
-//         createdAt: app.createdAt,
-//         updatedAt: app.updatedAt
-//       };
-//     });
-
-//     return res.status(200).json({
-//       success: true,
-//       appointments: formattedAppointments,
-//       totalPages: Math.ceil(totalAppointments / limit),
-//       currentPage: page
-//     });
-//   } catch (error) {
-//     console.error('Error fetching doctor appointments:', error);
-//     return res.status(500).json({
-//       success: false,
-//       message: 'Server error while getting doctor appointments.'
-//     });
-//   }
-// };
 const appointmentsDoctor = async (req, res) => {
   try {
     const { doctorId } = req.body; // doctorId vẫn lấy từ body
@@ -598,13 +432,16 @@ const doctorDashboard = async (req, res) => {
 const updateSlotStatus = async (req, res) => {
     try {
       const { doctorId, slotId, newStatus, isConfirm } = req.body;
-  
+
       if (!doctorId || !slotId || !newStatus) {
         return res.status(400).json({ success: false, message: "Missing required fields" });
       }
   
       // 1. Tìm doctor
+      
       const doctor = await doctorModel.findById(doctorId);
+
+      console.log("doc",doctor)
       if (!doctor) {
         return res.json({ success: false, message: "Doctor not found" });
       }
@@ -628,7 +465,7 @@ const updateSlotStatus = async (req, res) => {
       // 5. Nếu xác nhận -> tìm appointment cụ thể để lấy thông tin gửi email
       if (isConfirm) {
         const appointment = await appointmentModel.findOne({ docId: doctorId, slotId });
-  
+  console.log("2")
         if (appointment) {
           const patientEmail = appointment.userData.email;
           const appointmentDate = appointment.slotDate;
