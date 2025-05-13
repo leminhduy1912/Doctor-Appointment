@@ -1294,6 +1294,7 @@ const DoctorAppointments = () => {
   // Helper functions
   const updateStatusSlot = async (doctorId, slotId, newStatus) => {
     const payload = { doctorId, slotId, newStatus };
+    console.log("1")
     if (newStatus === 'waiting for payment') payload.isConfirm = true;
     await axios.post(`${backendUrl}/api/doctor/change-status-appointment`, payload, {
       headers: { dToken },

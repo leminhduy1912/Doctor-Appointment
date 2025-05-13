@@ -7,6 +7,8 @@ import doctorModel from "../models/doctor.model.js";
 import appointmentModel from "../models/appointment.model.js";
 import { sendConfirmationBookingAndPaymentRequestToUser, sendConfirmationCancelScheduleFromUserToDoctor, sendConfirmationScheduleToDoctor, sendConfirmationScheduleToUser, sendNotiNewBookingToDoctor } from "../config/mailer.js";
 import mongoose from "mongoose";
+import streamifier from 'streamifier';
+
 // API to register user
 const registerUser = async (req, res) => {
 
@@ -92,33 +94,59 @@ const getProfileById = async (req, res) => {
 }
 
 const updateProfile = async (req, res) => {
-    try {
-        const { userId, name, phone, address, gender, dob, image } = req.body;
+  try {
+    const { userId, name, phone, address, gender, dob } = req.body;
 
-        let updatedFields = { name, phone, address, gender, dob };
+    console.log("req.body:", req.body); // Kiểm tra xem có đủ data không
+    console.log("req.file:", req.file); // Kiểm tra xem có file không
 
-        // Cập nhật thông tin cơ bản
-        let updatedUser = await userModel.findByIdAndUpdate(userId, updatedFields, { new: true });
-
-        if (!updatedUser) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        // Nếu có ảnh mới thì cập nhật
-        if (image) {
-            const uploadResponse = await cloudinary.uploader.upload(image);
-            updatedUser = await userModel.findByIdAndUpdate(
-                userId, 
-                { image: uploadResponse.secure_url }, 
-                { new: true }
-            );
-        }
-
-        res.json({ message: "Profile updated successfully", user: updatedUser });
-    } catch (error) {
-        res.status(500).json({ message: "Internal server error", error: error.message });
+    const updatedFields = {};
+    if (name) updatedFields.name = name;
+    if (phone) updatedFields.phone = phone;
+    if (gender) updatedFields.gender = gender;
+    if (dob) updatedFields.dob = dob;
+    if (address) {
+      try {
+        updatedFields.address = JSON.parse(address); // nếu gửi object dạng JSON string
+      } catch (err) {
+        updatedFields.address = address; // nếu là object
+      }
     }
+
+    if (req.file) {
+      const streamUpload = (buffer) => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "avatars" },
+            (error, result) => {
+              if (result) resolve(result);
+              else reject(error);
+            }
+          );
+          streamifier.createReadStream(buffer).pipe(stream);
+        });
+      };
+
+      const result = await streamUpload(req.file.buffer);
+      console.log("Cloudinary upload result:", result);
+
+      updatedFields.image = result.secure_url;
+    }
+
+    const updatedUser = await userModel.findByIdAndUpdate(userId, updatedFields, { new: true });
+    
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ message: "Profile updated successfully", user: updatedUser });
+  } catch (error) {
+    console.error("Update error:", error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
 };
+
+
 
 
 const isUserExist = async (req, res) => {
@@ -224,61 +252,7 @@ const isUserExist = async (req, res) => {
 
   
 
-// const getAllAppointments = async (req, res) => {
-//   try {
-//     const userId = req.body.userId;
-//     const { page = 1, limit = 10, status } = req.query;
 
-//     // Xây điều kiện tìm kiếm
-//     const query = { userId };
-//     if (status && status !== 'all') {
-//       query.status = status;
-//     }
-
-//     const skip = (parseInt(page) - 1) * parseInt(limit);
-
-//     // Đếm tổng số lịch hẹn phù hợp
-//     const totalAppointments = await appointmentModel.countDocuments(query);
-
-//     // Lấy danh sách lịch hẹn có phân trang
-//     const appointments = await appointmentModel
-//       .find(query)
-//       .sort({ createdAt: -1 })
-//       .skip(skip)
-//       .limit(parseInt(limit));
-
-//     // Format dữ liệu trả về
-//     const formattedAppointments = appointments.map(app => ({
-//       _id: app._id,
-//       userData: app.userData,
-//       docData: app.docData,
-//       amount: app.amount,
-//       slotId: app.slotId,
-//       slotTime: app.slotTime,
-//       slotDate: app.slotDate,
-//       bookingDate: app.date,
-//       status: app.status,
-//       createdAt: app.createdAt,
-//       updatedAt: app.updatedAt,
-//       linkMeet: app.linkMeet,
-//       reason: app.reason,
-//     }));
-
-//     return res.status(200).json({
-//       success: true,
-//       appointments: formattedAppointments,
-//       total: totalAppointments,
-//       currentPage: parseInt(page),
-//       totalPages: Math.ceil(totalAppointments / limit),
-//     });
-//   } catch (error) {
-//     console.error('Error fetching appointments:', error);
-//     return res.status(500).json({
-//       success: false,
-//       message: 'Server error while getting appointments.'
-//     });
-//   }
-// };
 
 const getAllAppointments = async (req, res) => {
   try {

@@ -441,7 +441,7 @@ const updateSlotStatus = async (req, res) => {
       
       const doctor = await doctorModel.findById(doctorId);
 
-      console.log("doc",doctor)
+
       if (!doctor) {
         return res.json({ success: false, message: "Doctor not found" });
       }

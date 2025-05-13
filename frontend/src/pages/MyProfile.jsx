@@ -9,41 +9,58 @@ const MyProfile = () => {
     const [isEdit, setIsEdit] = useState(false)
 
     const [image, setImage] = useState(false)
+    const [loading, setLoading] = useState(false)
 
     const { token, backendUrl, userData, setUserData, loadUserProfileData } = useContext(AppContext)
 
     // Function to update user profile data using API
-    const updateUserProfileData = async () => {
+const updateUserProfileData = async () => {
+    try {
+        setLoading(true); // Bắt đầu loading
 
-        try {
+        const formData = new FormData();
+        formData.append("userId", userData._id); // hoặc userData.id nếu bạn dùng field này
+        formData.append("name", userData.name);
+        formData.append("phone", userData.phone);
+        formData.append("gender", userData.gender);
+        formData.append("dob", userData.dob);
 
-            const formData = new FormData();
-
-            formData.append('name', userData.name)
-            formData.append('phone', userData.phone)
-            formData.append('address', JSON.stringify(userData.address))
-            formData.append('gender', userData.gender)
-            formData.append('dob', userData.dob)
-
-            image && formData.append('image', image)
-
-            const { data } = await axios.post(backendUrl + '/api/user/update-profile', formData, { headers: { token } })
-
-            if (data.success) {
-                toast.success(data.message)
-                await loadUserProfileData()
-                setIsEdit(false)
-                setImage(false)
-            } else {
-                toast.error(data.message)
-            }
-
-        } catch (error) {
-            console.log(error)
-            toast.error(error.message)
+        // Nếu address là object, stringify nó để gửi đúng cách
+        if (typeof userData.address === 'object') {
+            formData.append("address", JSON.stringify(userData.address));
+        } else {
+            formData.append("address", userData.address);
         }
 
+        // Nếu người dùng chọn ảnh mới
+        if (image) {
+            formData.append("image", image); // Key "file" khớp với `req.file` trong multer
+        }
+
+        const { data } = await axios.post(
+            backendUrl + "/api/user/update-profile",
+            formData,
+             { headers: { token } }
+        );
+
+        console.log("Response:", data);
+
+        if (data.user) {
+            toast.success("Profile updated successfully");
+            await loadUserProfileData();
+            setIsEdit(false);
+            setImage(false);
+        }
+    } catch (error) {
+        console.log("Update failed:", error);
+        toast.error(error.message || "Update failed");
+    } finally {
+        setLoading(false); // Dừng loading
     }
+};
+
+    
+    
 
     return userData ? (
         <div className='max-w-lg flex flex-col gap-2 text-sm pt-5'>
@@ -115,10 +132,23 @@ const MyProfile = () => {
             </div>
             <div className='mt-10'>
 
-                {isEdit
-                    ? <button onClick={updateUserProfileData} className='border border-primary px-8 py-2 rounded-full hover:bg-primary hover:text-white transition-all'>Save information</button>
-                    : <button onClick={() => setIsEdit(true)} className='border border-primary px-8 py-2 rounded-full hover:bg-primary hover:text-white transition-all'>Edit</button>
-                }
+            {isEdit ? (
+    <button
+        onClick={updateUserProfileData}
+        disabled={loading}
+        className='border border-primary px-8 py-2 rounded-full hover:bg-primary hover:text-white transition-all flex items-center gap-2'
+    >
+        {loading && <span className="animate-spin h-4 w-4 border-2 border-t-transparent border-primary rounded-full"></span>}
+        {loading ? 'Saving...' : 'Save information'}
+    </button>
+) : (
+    <button
+        onClick={() => setIsEdit(true)}
+        className='border border-primary px-8 py-2 rounded-full hover:bg-primary hover:text-white transition-all'
+    >
+        Edit
+    </button>
+)}
 
             </div>
         </div>
