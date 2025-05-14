@@ -34,7 +34,7 @@ const updateUserProfileData = async () => {
 
         // Nếu người dùng chọn ảnh mới
         if (image) {
-            formData.append("image", image); // Key "file" khớp với `req.file` trong multer
+            formData.append("image", image); 
         }
 
         const { data } = await axios.post(

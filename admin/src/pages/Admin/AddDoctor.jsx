@@ -38,52 +38,51 @@ const [isLoading,setIsLoading] = useState(false)
         setPhoneNumber('');
     };
     
-    const onSubmitHandler = async (event) => {
-        event.preventDefault();
-    
-        try {
-            setIsLoading(true)
-            const body = {
-                name,
-                email,
-                password,
-                experience,
-                fees: Number(fees),
-                about,
-                speciality,
-                degree,
-                phoneNumber,
-                address: {
-                    line1: address1,
-                    line2: address2,
-                },
-            };
-    
-            const { data } = await axios.post(
-                backendUrl + '/api/admin/add-doctor',
-                body,
-                {
-                    headers: {
-                        aToken,
-                    },
-                }
-            );
-    console.log("data",data)
-            if (data.success) {
-                toast.success("Added new doctor succesfully !");
-                setIsLoading(false)
-                resetForm()
-                // Reset form
-            } else {
-                toast.error(data.message);
-            }
-        } catch (error) {
+const onSubmitHandler = async (event) => {
+  event.preventDefault();
+
+  try {
+    setIsLoading(true);
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("experience", experience);
+    formData.append("fees", fees);
+    formData.append("about", about);
+    formData.append("speciality", speciality);
+    formData.append("degree", degree);
+    formData.append("phoneNumber", phoneNumber);
+    // Gửi address dưới dạng JSON string
+    formData.append("address", address1);
+    // Gửi ảnh nếu có
+    if (docImg) {
+      formData.append("image", docImg);
+    }
+    const { data } = await axios.post(
+      backendUrl + '/api/admin/add-doctor',
+      formData,
+      { headers: { aToken } }
+    );
+
+    console.log("data", data);
+
+    if (data.success) {
+      toast.success("Added new doctor successfully!");
+      resetForm();
+    } else {
+      toast.error(data.message);
+    }
+  } catch (error) {
     const errorMsg = error.response?.data?.message || "Something went wrong!";
     toast.error(errorMsg);
+    console.error("Error:", errorMsg);
+  } finally {
     setIsLoading(false);
-    console.log("Error:", errorMsg);
-        }
-    };
+  }
+};
+
     
     return (
         <>
@@ -93,13 +92,13 @@ const [isLoading,setIsLoading] = useState(false)
 <p className='mb-3 text-lg font-medium'>Add Doctor</p>
 
 <div className='bg-white px-8 py-8 border rounded w-full max-w-4xl max-h-[80vh] overflow-y-scroll'>
-    {/* <div className='flex items-center gap-4 mb-8 text-gray-500'>
+    <div className='flex items-center gap-4 mb-8 text-gray-500'>
         <label htmlFor="doc-img">
             <img className='w-16 bg-gray-100 rounded-full cursor-pointer' src={docImg ? URL.createObjectURL(docImg) : assets.upload_area} alt="" />
         </label>
         <input onChange={(e) => setDocImg(e.target.files[0])} type="file" name="" id="doc-img" hidden />
         <p>Upload doctor <br /> picture</p>
-    </div> */}
+    </div>
 
     <div className='flex flex-col lg:flex-row items-start gap-10 text-gray-600'>
 
@@ -161,8 +160,7 @@ const [isLoading,setIsLoading] = useState(false)
 
             <div className='flex-1 flex flex-col gap-1'>
                 <p>Address</p>
-                <input onChange={e => setAddress1(e.target.value)} value={address1} className='border rounded px-3 py-2' type="text" placeholder='Address 1' required />
-                <input onChange={e => setAddress2(e.target.value)} value={address2} className='border rounded px-3 py-2' type="text" placeholder='Address 2' required />
+                <input onChange={e => setAddress1(e.target.value)} value={address1} className='border rounded px-3 py-2' type="text" placeholder='Address ' required />
             </div>
 
         </div>

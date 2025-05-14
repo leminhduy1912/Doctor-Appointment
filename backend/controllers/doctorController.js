@@ -14,7 +14,7 @@ const loginDoctor = async (req, res) => {
         const user = await doctorModel.findOne({ email })
 
         if (!user) {
-            return res.json({ success: false, message: "Invalid credentials" })
+            return res.json({ success: false, message: "Invalid username or password !" })
         }
         if (!user.available) {
           return res.json({ success: false, message: "Your account is unavailable" })
@@ -25,7 +25,7 @@ const loginDoctor = async (req, res) => {
             const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET)
             res.json({ success: true, token,id:user._id })
         } else {
-            res.json({ success: false, message: "Invalid credentials" })
+            res.json({ success: false, message: "Invalid username or password !" })
         }
 
 
@@ -267,36 +267,69 @@ const appointmentCancel = async (req, res) => {
 // };
 
 
+// const getDoctorList = async (req, res) => {
+//   try {
+//       const { speciality, page = 1, limit = 10 } = req.query;
+
+//       const filter = {};
+//       if (speciality) {
+//           filter.speciality = speciality;
+//       }
+
+//       const skip = (Number(page) - 1) * Number(limit);
+
+//       const doctors = await doctorModel
+//           .find(filter)
+//           .select("-password")
+//           .skip(skip)
+//           .limit(Number(limit))
+//           .sort({ createdAt: -1 }); // sắp xếp mới nhất trước
+
+//       const total = await doctorModel.countDocuments(filter);
+
+//       res.json({
+//           success: true,
+//           doctors,
+//           total,
+//           page: Number(page),
+//           totalPages: Math.ceil(total / limit),
+//       });
+//   } catch (error) {
+//       console.error("Error fetching doctors:", error);
+//       res.status(500).json({ success: false, message: "Internal Server Error" });
+//   }
+// };
 const getDoctorList = async (req, res) => {
   try {
-      const { speciality, page = 1, limit = 10 } = req.query;
+    const { speciality, page = 1, limit = 10 } = req.query;
 
-      const filter = {};
-      if (speciality) {
-          filter.speciality = speciality;
-      }
+    const filter = { available: true }; // Chỉ lấy bác sĩ đang available
 
-      const skip = (Number(page) - 1) * Number(limit);
+    if (speciality) {
+      filter.speciality = speciality;
+    }
 
-      const doctors = await doctorModel
-          .find(filter)
-          .select("-password")
-          .skip(skip)
-          .limit(Number(limit))
-          .sort({ createdAt: -1 }); // sắp xếp mới nhất trước
+    const skip = (Number(page) - 1) * Number(limit);
 
-      const total = await doctorModel.countDocuments(filter);
+    const doctors = await doctorModel
+      .find(filter)
+      .select("-password")
+      .skip(skip)
+      .limit(Number(limit))
+      .sort({ createdAt: -1 });
 
-      res.json({
-          success: true,
-          doctors,
-          total,
-          page: Number(page),
-          totalPages: Math.ceil(total / limit),
-      });
+    const total = await doctorModel.countDocuments(filter);
+
+    res.json({
+      success: true,
+      doctors,
+      total,
+      page: Number(page),
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (error) {
-      console.error("Error fetching doctors:", error);
-      res.status(500).json({ success: false, message: "Internal Server Error" });
+    console.error("Error fetching doctors:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
 

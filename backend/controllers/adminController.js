@@ -7,6 +7,8 @@ import { v2 as cloudinary } from "cloudinary";
 import { sendActivateFromAdminToDoctor, sendActivateFromAdminToPatient, sendConfirmationCancelScheduleFromDoctorToUser, sendConfirmationCancelScheduleFromUserToDoctor, sendDeactivateFromAdminToDoctor, sendDeactivateFromAdminToPatient } from '../config/mailer.js'
 import userModel from '../models/user.model.js'
 import mongoose from 'mongoose'
+import streamifier from 'streamifier';
+
 // API for admin login
 const loginAdmin = async (req, res) => {
     try {
@@ -17,7 +19,7 @@ const loginAdmin = async (req, res) => {
             const token = jwt.sign(email + password, process.env.JWT_SECRET)
             res.json({ success: true, token })
         } else {
-            res.json({ success: false, message: "Invalid credentials" })
+            res.json({ success: false, message: "Invalid username or password !" })
         }
 
     } catch (error) {
@@ -114,26 +116,23 @@ const getUserList = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
-
-
 const addDoctor = async (req, res) => {
     try {
         const {
-            image, name, email, password, speciality,
+            name, email, password, speciality,
             degree, experience, about,
             address, phoneNumber
         } = req.body;
 
-        console.log("Adding doctor:", name);
+        console.log("Adding doctor:", req.body);
 
         // Kiểm tra thiếu trường
-        if (!name || !email || !password || !speciality || !degree || !experience || !about  || !address || !phoneNumber) {
+        if (!name || !email || !password || !speciality || !degree || !experience || !about || !address || !phoneNumber) {
             return res.status(400).json({ success: false, message: "Missing Details" });
         }
 
-        // Kiểm tra email
         if (!validator.isEmail(email)) {
-            return res.status(400).json({ success: false, message: "Please enter a valid email" });
+            return res.status(400).json({ success: false, message: "Invalid email" });
         }
 
         const existingUser = await doctorModel.findOne({ email });
@@ -142,26 +141,34 @@ const addDoctor = async (req, res) => {
         }
 
         if (password.length < 8) {
-            return res.status(400).json({ success: false, message: "Please enter a strong password" });
+            return res.status(400).json({ success: false, message: "Password must be at least 8 characters" });
         }
 
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Upload image nếu là base64 hoặc file path
+        // Upload ảnh lên Cloudinary
         let imageUrl = '';
-        if (image) {
-            const uploadRes = await cloudinary.uploader.upload(image);
-            imageUrl = uploadRes.secure_url;
+        if (req.file) {
+            const streamUpload = (buffer) => {
+                return new Promise((resolve, reject) => {
+                    const stream = cloudinary.uploader.upload_stream(
+                        { folder: "doctors" },
+                        (error, result) => {
+                            if (result) resolve(result);
+                            else reject(error);
+                        }
+                    );
+                    streamifier.createReadStream(buffer).pipe(stream);
+                });
+            };
+
+            const uploadResult = await streamUpload(req.file.buffer);
+            imageUrl = uploadResult.secure_url;
         }
 
-        // Parse address nếu là chuỗi JSON
-        const formattedAddress = typeof address === 'string' ? JSON.parse(address) : address;
+        // Parse address nếu là JSON string
+const formattedAddress = address; // không cần parse
 
-        // Parse schedule nếu là chuỗi JSON
-        const formattedSchedule = typeof schedule === 'string' ? JSON.parse(schedule) : schedule;
-
-        // Tạo đối tượng bác sĩ mới
         const newDoctor = new doctorModel({
             name,
             email,
@@ -191,6 +198,82 @@ const addDoctor = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
+
+// const addDoctor = async (req, res) => {
+//     try {
+//         const {
+//             image, name, email, password, speciality,
+//             degree, experience, about,
+//             address, phoneNumber
+//         } = req.body;
+
+//         console.log("Adding doctor:", name);
+
+//         // Kiểm tra thiếu trường
+//         if (!name || !email || !password || !speciality || !degree || !experience || !about  || !address || !phoneNumber) {
+//             return res.status(400).json({ success: false, message: "Missing Details" });
+//         }
+
+//         // Kiểm tra email
+//         if (!validator.isEmail(email)) {
+//             return res.status(400).json({ success: false, message: "Please enter a valid email" });
+//         }
+
+//         const existingUser = await doctorModel.findOne({ email });
+//         if (existingUser) {
+//             return res.status(400).json({ success: false, message: "Email already in use" });
+//         }
+
+//         if (password.length < 8) {
+//             return res.status(400).json({ success: false, message: "Please enter a strong password" });
+//         }
+
+//         const salt = await bcrypt.genSalt(10);
+//         const hashedPassword = await bcrypt.hash(password, salt);
+
+//         // Upload image nếu là base64 hoặc file path
+//         let imageUrl = '';
+//         if (image) {
+//             const uploadRes = await cloudinary.uploader.upload(image);
+//             imageUrl = uploadRes.secure_url;
+//         }
+
+//         // Parse address nếu là chuỗi JSON
+//         const formattedAddress = typeof address === 'string' ? JSON.parse(address) : address;
+
+//         // Parse schedule nếu là chuỗi JSON
+//         const formattedSchedule = typeof schedule === 'string' ? JSON.parse(schedule) : schedule;
+
+//         // Tạo đối tượng bác sĩ mới
+//         const newDoctor = new doctorModel({
+//             name,
+//             email,
+//             phoneNumber,
+//             password: hashedPassword,
+//             speciality,
+//             degree,
+//             experience,
+//             about,
+//             address: formattedAddress,
+//             image: imageUrl,
+//             patients: [],
+//             createdAt: new Date(),
+//             updatedAt: new Date()
+//         });
+
+//         await newDoctor.save();
+
+//         return res.status(201).json({
+//             success: true,
+//             message: "Doctor added successfully",
+//             doctor: newDoctor
+//         });
+
+//     } catch (error) {
+//         console.error("Error adding doctor:", error);
+//         res.status(500).json({ success: false, message: "Internal Server Error" });
+//     }
+// };
 
 
 // API to get dashboard data for admin panel

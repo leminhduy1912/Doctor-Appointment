@@ -36,13 +36,6 @@ function App() {
           <Route path='/doctor-schedule' element={<DoctorSchedule />} />
           <Route path='/doctor-appointments' element={<DoctorAppointments />} />
           <Route path='/doctor-prescription' element={<DoctorPrescription />} />
-          {/* <Route path='/admin-dashboard' element={<Dashboard />} />
-          <Route path='/all-appointments' element={<AllAppointments />} />
-          <Route path='/add-doctor' element={<AddDoctor />} />
-          <Route path='/doctor-list' element={<DoctorsList />} />
-          <Route path='/doctor-dashboard' element={<DoctorDashboard />} />
-      
-          <Route path='/doctor-profile' element={<DoctorProfile />} /> */}
         </Routes>
       </div>
     </div>
