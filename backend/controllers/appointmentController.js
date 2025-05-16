@@ -1,5 +1,6 @@
 import { sendRequestConfirmationOfOnlineMedicalExamination } from "../config/mailer.js";
 import appointmentModel from "../models/appointment.model.js";
+import doctorModel from "../models/doctor.model.js";
 
 
 const generateRandomString = (length = 10) => {
@@ -60,6 +61,14 @@ const updateAppointmentCompletion = async (appointmentId, role) => {
   // Auto complete if both confirmed
   if (appointment.isDoctorConfirmedComplete && appointment.isUserConfirmedComplete) {
     appointment.status = "completed";
+     const doctor = await doctorModel.findById(appointment.docData._id);
+      if (!doctor) throw new Error("Doctor not found");
+     const scheduleSlot = doctor.schedule.id(appointment.slotId); 
+     if (scheduleSlot) {
+      scheduleSlot.status = "done";
+      await doctor.save(); // lưu doctor lại sau khi cập nhật
+    }
+   
   }
 
   await appointment.save();

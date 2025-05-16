@@ -6,9 +6,10 @@ import axios from 'axios'
 
 const DoctorProfile = () => {
 
-    const { dToken, profileData, setProfileData, getProfileData } = useContext(DoctorContext)
+    const { profileData, setProfileData } = useContext(DoctorContext)
     const { currency, backendUrl } = useContext(AppContext)
     const [isEdit, setIsEdit] = useState(false)
+    const [dToken, setDToken] = useState(localStorage.getItem('dToken') ? localStorage.getItem('dToken') : '')
 
     const updateProfile = async () => {
 
@@ -39,7 +40,21 @@ const DoctorProfile = () => {
         }
 
     }
-
+  const getProfileData = async () => {
+        try {
+            console.log("get profile id",dToken);
+            
+          const { data } = await axios.get(`${backendUrl}/api/doctor/profile`,
+ 
+            { headers: { dToken } } // gửi token trong headers
+          );
+          console.log(data);
+          setProfileData(data.profileData);
+        } catch (error) {
+          console.log(error);
+          toast.error(error.response?.data?.message || error.message);
+        }
+      };
     useEffect(() => {
         if (dToken) {
             getProfileData()
@@ -60,7 +75,7 @@ const DoctorProfile = () => {
                     <p className='flex items-center gap-2 text-3xl font-medium text-gray-700'>{profileData.name}</p>
                     <div className='flex items-center gap-2 mt-1 text-gray-600'>
                         <p>{profileData.degree} - {profileData.speciality}</p>
-                        <button className='py-0.5 px-2 border text-xs rounded-full'>{profileData.experience}</button>
+                        <button className='py-0.5 px-2 border text-xs rounded-full'>{profileData.experience} {" Year(s)"}</button>
                     </div>
 
                     {/* ----- Doc About ----- */}
@@ -75,7 +90,7 @@ const DoctorProfile = () => {
                         </p>
                     </div>
 
-                    <p className='text-gray-600 font-medium mt-4'>
+                    {/* <p className='text-gray-600 font-medium mt-4'>
                         Appointment fee: <span className='text-gray-800'>{currency} {isEdit ? <input type='number' onChange={(e) => setProfileData(prev => ({ ...prev, fees: e.target.value }))} value={profileData.fees} /> : profileData.fees}</span>
                     </p>
 
@@ -86,7 +101,67 @@ const DoctorProfile = () => {
                             <br />
                             {isEdit ? <input type='text' onChange={(e) => setProfileData(prev => ({ ...prev, address: { ...prev.address, line2: e.target.value } }))} value={profileData.address.line2} /> : profileData.address.line2}
                         </p>
-                    </div>
+                    </div> */}
+
+
+                    {/* Appointment Fee */}
+<div className="mt-6">
+  <label className="block text-gray-600 font-medium mb-1">Appointment Fee:</label>
+  {isEdit ? (
+    <input
+      type="number"
+      className="w-32 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+      value={profileData.fees}
+      onChange={(e) =>
+        setProfileData((prev) => ({ ...prev, fees: e.target.value }))
+      }
+    />
+  ) : (
+    <p className="text-gray-800 text-sm">
+      {currency} {profileData.fees}
+    </p>
+  )}
+</div>
+
+{/* Address */}
+<div className="mt-6">
+  <label className="block text-gray-600 font-medium mb-1">Address:</label>
+  {isEdit ? (
+    <div className="space-y-2">
+      <input
+        type="text"
+        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+        value={profileData.address.line1}
+        placeholder="Street address"
+        onChange={(e) =>
+          setProfileData((prev) => ({
+            ...prev,
+            address: { ...prev.address, line1: e.target.value },
+          }))
+        }
+      />
+      <input
+        type="text"
+        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+        value={profileData.address.line2}
+        placeholder="City/Region"
+        onChange={(e) =>
+          setProfileData((prev) => ({
+            ...prev,
+            address: { ...prev.address, line2: e.target.value },
+          }))
+        }
+      />
+    </div>
+  ) : (
+    <p className="text-gray-800 text-sm">
+      {profileData.address.line1}
+      <br />
+      {profileData.address.line2}
+    </p>
+  )}
+</div>
+
 
                     <div className='flex gap-1 pt-2'>
                         <input type="checkbox" onChange={() => isEdit && setProfileData(prev => ({ ...prev, available: !prev.available }))} checked={profileData.available} />

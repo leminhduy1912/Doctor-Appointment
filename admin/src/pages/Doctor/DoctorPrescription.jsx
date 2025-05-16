@@ -35,12 +35,7 @@ const DoctorPrescription = () => {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
 
   const [showViewPrescriptionModal, setShowViewPrescriptionModal] = useState(false);
-
-
-  // Fetch appointments
-  useEffect(() => {
-    if (!dToken) return;
-    const fetchAppointments = async () => {
+ const fetchAppointments = async () => {
       try {
         setLoading(true);
         const response = await axios.get(`${backendUrl}/api/doctor/appointments`, {
@@ -55,6 +50,25 @@ const DoctorPrescription = () => {
         setLoading(false);
       }
     };
+
+  // Fetch appointments
+  useEffect(() => {
+    if (!dToken) return;
+    // const fetchAppointments = async () => {
+    //   try {
+    //     setLoading(true);
+    //     const response = await axios.get(`${backendUrl}/api/doctor/appointments`, {
+    //       params: { page: currentPage, status: filterStatus },
+    //       headers: { dToken },
+    //     });
+    //     setAppointments(response.data.appointments);
+    //     setTotalPages(response.data.totalPages);
+    //   } catch (error) {
+    //     toast.error('Failed to load appointments!');
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // };
     fetchAppointments();
   }, [currentPage, filterStatus, dToken]);
 
@@ -197,6 +211,7 @@ const DoctorPrescription = () => {
  appointment={selectedAppointment}
  dToken={dToken}
  backendUrl={backendUrl}
+  fetchAppointment={fetchAppointments}
 />
 
 
@@ -212,6 +227,7 @@ const DoctorPrescription = () => {
  appointmentId={selectedAppointment._id}
  dToken={dToken}
  backendUrl={backendUrl}
+
 />
 
 
