@@ -13,6 +13,7 @@ const Login = () => {
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
 
+  const [error, setError] = useState('')
   const navigate = useNavigate()
   const { backendUrl, token, setToken } = useContext(AppContext)
 
@@ -25,7 +26,19 @@ const Login = () => {
     if (step === 'signup') setStep('otp')
     if (step === 'login') setStep('email')
   }
+const handleEmailChange = (e) => {
+    const value = e.target.value
+    setEmail(value)
+console.log(email);
 
+    // Kiểm tra định dạng email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(value)) {
+      setError('Please enter a valid email address')
+    } else {
+      setError('')
+    }
+  }
   const handleSendOTP = async () => {
     if (!email) return toast.error('Email is required')
 
@@ -138,10 +151,13 @@ const Login = () => {
                 <input
                   type='email'
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  //onChange={(e) => setEmail(e.target.value)}
+                  onChange={handleEmailChange}
                   className='border border-[#DADADA] rounded w-full p-2 mt-1'
                   required
+                  placeholder='Enter your email'
                 />
+                {error && <p className='text-red-500 text-sm mt-1'>{error}</p>}
               </div>
               <div className='w-full'>
                 <p>Password</p>
@@ -151,8 +167,19 @@ const Login = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   className='border border-[#DADADA] rounded w-full p-2 mt-1'
                   required
+                  placeholder='Enter your password'
                 />
               </div>
+               {/* Forgot Password link */}
+    <div className='w-full text-right mt-1'>
+      <button
+        //onClick={handleForgotPassword}
+        className='text-sm text-blue-500 hover:underline hover:text-blue-600 transition duration-150'
+        type='button'
+      >
+        Forgot password?
+      </button>
+    </div>
               <div className='flex w-full gap-3'>
                 <button
                   type='button'
@@ -189,10 +216,13 @@ const Login = () => {
                 <input
                   type='email'
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  //onChange={(e) => setEmail(e.target.value)}
+                  onChange={handleEmailChange}
                   className='border border-[#DADADA] rounded w-full p-2 mt-1'
                   required
+                  placeholder='Enter your email'
                 />
+                {error && <p className='text-red-500 text-sm mt-1'>{error}</p>}
               </div>
               <button
                 type='button'

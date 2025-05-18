@@ -112,7 +112,7 @@ const [selectedItemToSendConfirmToDoctor,setSelectedItemToSendConfirmToDoctor] =
     setJoinModal({ open: false, link: null });
   };
 
-  const statusOptions = ['all', 'pending', 'waiting for payment', 'cancelled', 'booked', 'completed'];
+  const statusOptions = ['all', 'pending', 'waiting for payment', 'booked', 'completed','cancelled'];
 
 const handleViewPrescription = (item) => {
   setSelectedPrescription(item);
@@ -408,7 +408,7 @@ const handleCallApiConfirmationRequestToDoctor = async ()=>{
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-sm w-full">
             <h3 className="text-lg font-semibold mb-4">Confirm Action</h3>
-            <p className="mb-6">Are you sure you want to send the completion confirmation?</p>
+            <p className="mb-6">Are you sure you want to send the completion confirmation ?</p>
             
             <div className="flex justify-end gap-3">
               <button
