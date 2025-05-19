@@ -28,6 +28,7 @@ const MyProfile = () => {
       formData.append("phone", userData.phone);
       formData.append("gender", userData.gender);
       formData.append("dob", userData.dob);
+      formData.append("available", userData.available);
 
       if (typeof userData.address === 'object') {
         formData.append("address", JSON.stringify(userData.address));
@@ -184,6 +185,33 @@ const MyProfile = () => {
               />
             ) : (
               <p>{userData.dob}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+            <label className="font-medium w-28">Available:</label>
+            {isEdit ? (
+              <select
+                className="bg-gray-100 px-3 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-primary max-w-[160px]"
+                onChange={(e) =>
+                  setUserData((prev) => ({ ...prev, available: e.target.value }))
+                }
+                value={userData.available}
+              >
+                <option value="true">Available</option>
+                <option value="false">Unavailable</option>
+              </select>
+            ) : (
+              <select
+              disabled
+              value={userData.available}
+                className="bg-gray-100 px-3 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-primary max-w-[160px]"
+              
+              >
+          
+                <option  value="true">Available</option>
+                <option value="false">Unavailable</option>
+              </select>
             )}
           </div>
         </div>

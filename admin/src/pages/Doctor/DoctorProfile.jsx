@@ -1,407 +1,4 @@
-// import React, { useContext, useEffect, useState } from 'react'
-// import { DoctorContext } from '../../context/DoctorContext'
-// import { AppContext } from '../../context/AppContext'
-// import { toast } from 'react-toastify'
-// import axios from 'axios'
 
-// const DoctorProfile = () => {
-
-//     const { profileData, setProfileData } = useContext(DoctorContext)
-//     const { currency, backendUrl } = useContext(AppContext)
-//     const [isEdit, setIsEdit] = useState(false)
-//     const [dToken, setDToken] = useState(localStorage.getItem('dToken') ? localStorage.getItem('dToken') : '')
-
-//     const updateProfile = async () => {
-
-//         try {
-
-//             const updateData = {
-//                 address: profileData.address,
-//                 fees: profileData.fees,
-//                 about: profileData.about,
-//                 available: profileData.available
-//             }
-
-//             const { data } = await axios.post(backendUrl + '/api/doctor/update-profile', updateData, { headers: { dToken } })
-
-//             if (data.success) {
-//                 toast.success(data.message)
-//                 setIsEdit(false)
-//                 getProfileData()
-//             } else {
-//                 toast.error(data.message)
-//             }
-
-//             setIsEdit(false)
-
-//         } catch (error) {
-//             toast.error(error.message)
-//             console.log(error)
-//         }
-
-//     }
-//   const getProfileData = async () => {
-//         try {
-//             console.log("get profile id",dToken);
-            
-//           const { data } = await axios.get(`${backendUrl}/api/doctor/profile`,
- 
-//             { headers: { dToken } } // gửi token trong headers
-//           );
-//           console.log(data);
-//           setProfileData(data.profileData);
-//         } catch (error) {
-//           console.log(error);
-//           toast.error(error.response?.data?.message || error.message);
-//         }
-//       };
-//     useEffect(() => {
-//         if (dToken) {
-//             getProfileData()
-//         }
-//     }, [dToken])
-
-//     return profileData && (
-//         <div>
-//             <div className='flex flex-col gap-4 m-5'>
-//                 <div>
-//                     <img className='bg-primary/80 w-full sm:max-w-64 rounded-lg' src={profileData.image} alt="" />
-//                 </div>
-
-//                 <div className='flex-1 border border-stone-100 rounded-lg p-8 py-7 bg-white'>
-
-//                     {/* ----- Doc Info : name, degree, experience ----- */}
-
-//                     <p className='flex items-center gap-2 text-3xl font-medium text-gray-700'>{profileData.name}</p>
-//                     <div className='flex items-center gap-2 mt-1 text-gray-600'>
-//                         <p>{profileData.degree} - {profileData.speciality}</p>
-//                         <button className='py-0.5 px-2 border text-xs rounded-full'>{profileData.experience} {" Year(s)"}</button>
-//                     </div>
-
-//                     {/* ----- Doc About ----- */}
-//                     <div>
-//                         <p className='flex items-center gap-1 text-sm font-medium text-[#262626] mt-3'>About :</p>
-//                         <p className='text-sm text-gray-600 max-w-[700px] mt-1'>
-//                             {
-//                                 isEdit
-//                                     ? <textarea onChange={(e) => setProfileData(prev => ({ ...prev, about: e.target.value }))} type='text' className='w-full outline-primary p-2' rows={8} value={profileData.about} />
-//                                     : profileData.about
-//                             }
-//                         </p>
-//                     </div>
-
-//                     {/* <p className='text-gray-600 font-medium mt-4'>
-//                         Appointment fee: <span className='text-gray-800'>{currency} {isEdit ? <input type='number' onChange={(e) => setProfileData(prev => ({ ...prev, fees: e.target.value }))} value={profileData.fees} /> : profileData.fees}</span>
-//                     </p>
-
-//                     <div className='flex gap-2 py-2'>
-//                         <p>Address:</p>
-//                         <p className='text-sm'>
-//                             {isEdit ? <input type='text' onChange={(e) => setProfileData(prev => ({ ...prev, address: { ...prev.address, line1: e.target.value } }))} value={profileData.address.line1} /> : profileData.address.line1}
-//                             <br />
-//                             {isEdit ? <input type='text' onChange={(e) => setProfileData(prev => ({ ...prev, address: { ...prev.address, line2: e.target.value } }))} value={profileData.address.line2} /> : profileData.address.line2}
-//                         </p>
-//                     </div> */}
-
-
-//                     {/* Appointment Fee */}
-// <div className="mt-6">
-//   <label className="block text-gray-600 font-medium mb-1">Appointment Fee:</label>
-//   {isEdit ? (
-//     <input
-//       type="number"
-//       className="w-32 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-//       value={profileData.fees}
-//       onChange={(e) =>
-//         setProfileData((prev) => ({ ...prev, fees: e.target.value }))
-//       }
-//     />
-//   ) : (
-//     <p className="text-gray-800 text-sm">
-//       {currency} {profileData.fees}
-//     </p>
-//   )}
-// </div>
-
-// {/* Address */}
-// <div className="mt-6">
-//   <label className="block text-gray-600 font-medium mb-1">Address:</label>
-//   {isEdit ? (
-//     <div className="space-y-2">
-//       <input
-//         type="text"
-//         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-//         value={profileData.address.line1}
-//         placeholder="Street address"
-//         onChange={(e) =>
-//           setProfileData((prev) => ({
-//             ...prev,
-//             address: { ...prev.address, line1: e.target.value },
-//           }))
-//         }
-//       />
-//       <input
-//         type="text"
-//         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-//         value={profileData.address.line2}
-//         placeholder="City/Region"
-//         onChange={(e) =>
-//           setProfileData((prev) => ({
-//             ...prev,
-//             address: { ...prev.address, line2: e.target.value },
-//           }))
-//         }
-//       />
-//     </div>
-//   ) : (
-//     <p className="text-gray-800 text-sm">
-//       {profileData.address.line1}
-//       <br />
-//       {profileData.address.line2}
-//     </p>
-//   )}
-// </div>
-
-
-//                     <div className='flex gap-1 pt-2'>
-//                         <input type="checkbox" onChange={() => isEdit && setProfileData(prev => ({ ...prev, available: !prev.available }))} checked={profileData.available} />
-//                         <label htmlFor="">Available</label>
-//                     </div>
-
-//                     {
-//                         isEdit
-//                             ? <button onClick={updateProfile} className='px-4 py-1 border border-primary text-sm rounded-full mt-5 hover:bg-primary hover:text-white transition-all'>Save</button>
-//                             : <button onClick={() => setIsEdit(prev => !prev)} className='px-4 py-1 border border-primary text-sm rounded-full mt-5 hover:bg-primary hover:text-white transition-all'>Edit</button>
-//                     }
-
-//                 </div>
-//             </div>
-//         </div>
-//     )
-// }
-
-// export default DoctorProfile
-
-
-
-
-
-
-
-
-// import React, { useContext, useEffect, useState } from 'react';
-// import { DoctorContext } from '../../context/DoctorContext';
-// import { AppContext } from '../../context/AppContext';
-// import { toast } from 'react-toastify';
-// import axios from 'axios';
-
-// const DoctorProfile = () => {
-//   const { profileData, setProfileData } = useContext(DoctorContext);
-//   const { currency, backendUrl } = useContext(AppContext);
-//   const [isEdit, setIsEdit] = useState(false);
-//   const [dToken, setDToken] = useState(localStorage.getItem('dToken') || '');
-
-//   const updateProfile = async () => {
-//     try {
-//       const { address, fees, about, available } = profileData;
-
-//       // Validate input
-//       if (!about || about.trim() === '') {
-//         toast.warning('About field cannot be empty');
-//         return;
-//       }
-
-//       if (fees === '' || isNaN(fees) || Number(fees) < 0) {
-//         toast.warning('Fees must be a valid non-negative number');
-//         return;
-//       }
-
-//       const updateData = {
-//         address,
-//         fees: Number(fees),
-//         about,
-//         available,
-//       };
-
-//       const { data } = await axios.post(
-//         backendUrl + '/api/doctor/update-profile',
-//         updateData,
-//         { headers: { dToken } }
-//       );
-
-//       if (data.success) {
-//         toast.success(data.message);
-//         setIsEdit(false);
-//         getProfileData();
-//       } else {
-//         toast.error(data.message);
-//       }
-//     } catch (error) {
-//       toast.error(error.message);
-//       console.log(error);
-//     }
-//   };
-
-//   const getProfileData = async () => {
-//     try {
-//       const { data } = await axios.get(`${backendUrl}/api/doctor/profile`, {
-//         headers: { dToken },
-//       });
-//       setProfileData(data.profileData);
-//     } catch (error) {
-//       toast.error(error.response?.data?.message || error.message);
-//     }
-//   };
-
-//   useEffect(() => {
-//     if (dToken) getProfileData();
-//   }, [dToken]);
-
-//   return (
-//     profileData && (
-//       <div>
-//         <div className="flex flex-col gap-4 m-5">
-//           <div>
-//             <img
-//               className="bg-primary/80 w-full sm:max-w-64 rounded-lg"
-//               src={profileData.image}
-//               alt=""
-//             />
-//           </div>
-
-//           <div className="flex-1 border border-stone-100 rounded-lg p-8 py-7 bg-white">
-//             {/* ----- Doctor Info ----- */}
-//             <p className="flex items-center gap-2 text-3xl font-medium text-gray-700">
-//               {profileData.name}
-//             </p>
-//             <div className="flex items-center gap-2 mt-1 text-gray-600">
-//               <p>
-//                 {profileData.degree} - {profileData.speciality}
-//               </p>
-//               <button className="py-0.5 px-2 border text-xs rounded-full">
-//                 {profileData.experience} Year(s)
-//               </button>
-//             </div>
-
-//             {/* About */}
-//             <div className="mt-4">
-//               <label className="block text-sm font-medium text-gray-700">About:</label>
-//               {isEdit ? (
-//                 <textarea
-//                   rows={6}
-//                   value={profileData.about}
-//                   onChange={(e) =>
-//                     setProfileData((prev) => ({ ...prev, about: e.target.value }))
-//                   }
-//                   className="w-full p-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-//                 />
-//               ) : (
-//                 <p className="text-sm text-gray-600 mt-1">{profileData.about}</p>
-//               )}
-//             </div>
-
-//             {/* Fees */}
-//             <div className="mt-6">
-//               <label className="block text-gray-600 font-medium mb-1">Appointment Fee:</label>
-//               {isEdit ? (
-//                 <input
-//                   type="number"
-//                   min={0}
-//                   className="w-32 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-//                   value={profileData.fees}
-//                   onChange={(e) =>
-//                     setProfileData((prev) => ({
-//                       ...prev,
-//                       fees: e.target.value,
-//                     }))
-//                   }
-//                 />
-//               ) : (
-//                 <p className="text-gray-800 text-sm">
-//                   {currency} {profileData.fees}
-//                 </p>
-//               )}
-//             </div>
-
-//             {/* Address */}
-//             <div className="mt-6">
-//               <label className="block text-gray-600 font-medium mb-1">Address:</label>
-//               {isEdit ? (
-//                 <div className="space-y-2">
-//                   <input
-//                     type="text"
-//                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-//                     value={profileData.address.line1}
-//                     placeholder="Street address"
-//                     onChange={(e) =>
-//                       setProfileData((prev) => ({
-//                         ...prev,
-//                         address: { ...prev.address, line1: e.target.value },
-//                       }))
-//                     }
-//                   />
-//                   <input
-//                     type="text"
-//                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-//                     value={profileData.address.line2}
-//                     placeholder="City/Region"
-//                     onChange={(e) =>
-//                       setProfileData((prev) => ({
-//                         ...prev,
-//                         address: { ...prev.address, line2: e.target.value },
-//                       }))
-//                     }
-//                   />
-//                 </div>
-//               ) : (
-//                 <p className="text-gray-800 text-sm">
-//                   {profileData.address.line1}
-//                   <br />
-//                   {profileData.address.line2}
-//                 </p>
-//               )}
-//             </div>
-
-//             {/* Availability */}
-//             <div className="flex gap-2 items-center pt-4">
-//               <input
-//                 type="checkbox"
-//                 checked={profileData.available}
-//                 onChange={() =>
-//                   isEdit &&
-//                   setProfileData((prev) => ({
-//                     ...prev,
-//                     available: !prev.available,
-//                   }))
-//                 }
-//               />
-//               <label className="text-sm text-gray-700">Available</label>
-//             </div>
-
-//             {/* Buttons */}
-//             {isEdit ? (
-//               <button
-//                 onClick={updateProfile}
-//                 className="mt-6 px-4 py-2 border border-primary text-sm rounded-full hover:bg-primary hover:text-white transition-all"
-//               >
-//                 Save
-//               </button>
-//             ) : (
-//               <button
-//                 onClick={() => setIsEdit(true)}
-//                 className="mt-6 px-4 py-2 border border-primary text-sm rounded-full hover:bg-primary hover:text-white transition-all"
-//               >
-//                 Edit
-//               </button>
-//             )}
-//           </div>
-//         </div>
-//       </div>
-//     )
-//   );
-// };
-
-// export default DoctorProfile;
 
 
 
@@ -411,52 +8,125 @@ import { DoctorContext } from '../../context/DoctorContext';
 import { AppContext } from '../../context/AppContext';
 import { toast } from 'react-toastify';
 import axios from 'axios';
-
+import { FaCamera } from "react-icons/fa6";
+import { formatVND } from '../../../../backend/utils/formatVND';
 const DoctorProfile = () => {
   const { profileData, setProfileData } = useContext(DoctorContext);
+ 
+
+    const [loading, setLoading] = useState(false);
   const { currency, backendUrl } = useContext(AppContext);
   const [isEdit, setIsEdit] = useState(false);
   const [dToken, setDToken] = useState(localStorage.getItem('dToken') || '');
+ const [image, setImage] = useState(null);
+ const updateProfile = async () => {
+  setLoading(true);
+  try {
+    const {
+      name,
+      phoneNumber,
+      address,
+      speciality,
+      experience,
+      degree,
+      about,
+      fees,
+      available
+    } = profileData;
 
-  const updateProfile = async () => {
-    try {
-      const { address, fees, about, available } = profileData;
-
-      if (!about || about.trim() === '') {
-        toast.warning('About field cannot be empty');
-        return;
-      }
-
-      if (fees === '' || isNaN(fees) || Number(fees) < 0) {
-        toast.warning('Fees must be a valid non-negative number');
-        return;
-      }
-
-      const updateData = {
-        address,
-        fees: Number(fees),
-        about,
-        available,
-      };
-
-      const { data } = await axios.post(
-        backendUrl + '/api/doctor/update-profile',
-        updateData,
-        { headers: { dToken } }
-      );
-
-      if (data.success) {
-        toast.success(data.message);
-        setIsEdit(false);
-        getProfileData();
-      } else {
-        toast.error(data.message);
-      }
-    } catch (error) {
-      toast.error(error.message);
-      console.log(error);
+    // Validate all required fields
+    if (!name?.trim()) {
+      toast.warning('Name is required');
+      setLoading(false);
+      return;
     }
-  };
+
+    if (!phoneNumber?.trim()) {
+      toast.warning('Phone number is required');
+      setLoading(false);
+      return;
+    }
+
+    if (!address?.trim()) {
+      toast.warning('Address is required');
+      setLoading(false);
+      return;
+    }
+
+    if (!speciality?.trim()) {
+      toast.warning('Speciality is required');
+      setLoading(false);
+      return;
+    }
+
+    if (!experience) {
+      toast.warning('Experience is required');
+      setLoading(false);
+      return;
+    }
+
+    if (!degree?.trim()) {
+      toast.warning('Degree is required');
+      setLoading(false);
+      return;
+    }
+
+    if (!about?.trim()) {
+      toast.warning('About field is required');
+      setLoading(false);
+      return;
+    }
+
+    
+
+    if (available === '') {
+      toast.warning('Availability selection is required');
+      setLoading(false);
+      return;
+    }
+
+    // Prepare data
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('phoneNumber', phoneNumber);
+    formData.append('address', address);
+    formData.append('speciality', speciality);
+    formData.append('experience', experience);
+    formData.append('degree', degree);
+    formData.append('about', about);
+    if (fees){
+    formData.append('fees', Number(fees));
+    }
+
+    formData.append('available', available);
+
+    if (image) {
+      formData.append('image', image);
+    }
+
+    const { data } = await axios.put(
+      backendUrl + '/api/doctor/profile',
+      formData,
+      {
+        headers: { dToken },
+      }
+    );
+
+    if (data.doctor) {
+      toast.success("Doctor profile updated successfully !");
+      setIsEdit(false);
+      getProfileData();
+    } else {
+      toast.error(data.message);
+    }
+  } catch (error) {
+    toast.error(error.message || "Update failed");
+    console.log(error);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const getProfileData = async () => {
     try {
@@ -472,153 +142,267 @@ const DoctorProfile = () => {
   useEffect(() => {
     if (dToken) getProfileData();
   }, [dToken]);
+console.log(profileData.available);
 
   return (
     profileData && (
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        <div className="grid sm:grid-cols-3 gap-8">
-          {/* Avatar */}
-          <div className="flex justify-center  sm:justify-start">
-            <img
-              className="w-48 h-48 object-cover rounded-full shadow-md border-4 border-primary"
-              src={profileData.image}
-              alt="Doctor Avatar"
-            />
+        <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-6 mt-8 text-sm">
+           <div className="flex flex-col items-center gap-4">
+                  {isEdit ? (
+                    <label htmlFor="image">
+                      <div className="relative w-36 h-36">
+                        <img
+                          className="w-36 h-36 object-cover rounded-full border-4 border-primary shadow-md"
+                          src={image ? URL.createObjectURL(image) : profileData.image}
+                          alt="Profile"
+                        />
+                        <div className="absolute bottom-2 right-2 bg-white p-1 rounded-full shadow-md">
+                          <FaCamera className="w-6 h-6 text-primary" />
+                        </div>
+                      </div>
+                      <input
+                        type="file"
+                        id="image"
+                        hidden
+                        onChange={(e) => setImage(e.target.files[0])}
+                      />
+                    </label>
+                  ) : (
+                    <img
+                      className="w-36 h-36 object-cover rounded-full border-4 border-primary shadow-md"
+                      src={profileData.image}
+                      alt="Profile"
+                    />
+                  )}
+          
+                  {isEdit ? (
+                    <input
+                      className="text-2xl font-semibold text-center border-b-2 border-gray-300 focus:outline-none focus:border-primary w-64"
+                      type="text"
+                      onChange={(e) =>
+                        setProfileData((prev) => ({ ...prev, name: e.target.value }))
+                      }
+                      value={profileData.name}
+                    />
+                  ) : (
+                    <h2 className="text-2xl font-semibold">{profileData.name}</h2>
+                  )}
+                </div>
+          
+                <hr className="my-6 border-gray-300" />
+
+                
+
+                    <section>
+        <p className="text-primary font-semibold mb-2">Contact Information</p>
+        <div className="grid gap-4 text-gray-700">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+            <label className="font-medium w-28">Email:</label>
+            <p className="text-blue-500">{profileData.email}</p>
           </div>
 
-          {/* Info */}
-          <div className="sm:col-span-2 bg-white shadow-md rounded-2xl p-6 space-y-6 border border-gray-100">
-            {/* Name + Degree */}
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-800">{profileData.name}</h2>
-              <div className="text-gray-600 text-sm mt-1 flex items-center gap-2">
-                <span>
-                  {profileData.degree} - {profileData.speciality}
-                </span>
-                <span className="bg-gray-100 px-2 py-0.5 text-xs rounded-full">
-                  {profileData.experience} Year(s)
-                </span>
-              </div>
-            </div>
-
-            {/* About */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">About</label>
-              {isEdit ? (
-                <textarea
-                  rows={4}
-                  value={profileData.about}
-                  onChange={(e) =>
-                    setProfileData((prev) => ({ ...prev, about: e.target.value }))
-                  }
-                  className="w-full p-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none"
-                />
-              ) : (
-                <p className="text-sm text-gray-700">{profileData.about}</p>
-              )}
-            </div>
-
-            {/* Fees */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Appointment Fee</label>
-              {isEdit ? (
-                <input
-                  type="number"
-                  min={0}
-                  value={profileData.fees}
-                  onChange={(e) =>
-                    setProfileData((prev) => ({
-                      ...prev,
-                      fees: e.target.value,
-                    }))
-                  }
-                  className="w-40 p-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none"
-                />
-              ) : (
-                <p className="text-sm text-gray-800">
-                  {currency} {profileData.fees}
-                </p>
-              )}
-            </div>
-
-            {/* Address */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-              {isEdit ? (
-                <div className="space-y-2">
-                  <input
-                    type="text"
-                    placeholder="Street address"
-                    value={profileData.address.line1}
-                    onChange={(e) =>
-                      setProfileData((prev) => ({
-                        ...prev,
-                        address: { ...prev.address, line1: e.target.value },
-                      }))
-                    }
-                    className="w-full p-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none"
-                  />
-                  <input
-                    type="text"
-                    placeholder="City/Region"
-                    value={profileData.address.line2}
-                    onChange={(e) =>
-                      setProfileData((prev) => ({
-                        ...prev,
-                        address: { ...prev.address, line2: e.target.value },
-                      }))
-                    }
-                    className="w-full p-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none"
-                  />
-                </div>
-              ) : (
-                <p className="text-sm text-gray-700">
-                  {profileData.address.line1}
-                  <br />
-                  {profileData.address.line2}
-                </p>
-              )}
-            </div>
-
-            {/* Available Checkbox */}
-            <div className="flex items-center gap-2 pt-2">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+            <label className="font-medium w-28">Phone:</label>
+            {isEdit ? (
               <input
-                type="checkbox"
-                checked={profileData.available}
-                onChange={() =>
-                  isEdit &&
-                  setProfileData((prev) => ({
-                    ...prev,
-                    available: !prev.available,
-                  }))
+                type="number"
+                className="bg-gray-100 px-3 py-2 rounded-md border w-full max-w-md focus:outline-none focus:ring-2 focus:ring-primary"
+                value={profileData.phoneNumber}
+                onChange={(e) =>
+                  setProfileData((prev) => ({ ...prev, phoneNumber: e.target.value }))
                 }
-                className="h-4 w-4 text-primary border-gray-300 rounded"
               />
-              <label className="text-sm text-gray-700">Available</label>
-            </div>
+            ) : (
+              <p>{profileData.phoneNumber}</p>
+            )}
+          </div>
 
-            {/* Action Buttons */}
-            <div className="pt-4">
-              {isEdit ? (
-                <button
-                  onClick={updateProfile}
-                  className="px-5 py-2 bg-primary text-white text-sm rounded-full hover:bg-primary/90 transition"
-                >
-                  Save
-                </button>
-              ) : (
-                <button
-                  onClick={() => setIsEdit(true)}
-                  className="px-5 py-2 border border-primary text-primary text-sm rounded-full hover:bg-primary hover:text-white transition"
-                >
-                  Edit
-                </button>
-              )}
-            </div>
+          <div className="flex flex-col sm:flex-row sm:items-start sm:gap-4">
+            <label className="font-medium w-28">Address:</label>
+            {isEdit ? (
+              <textarea
+                rows={2}
+                className="bg-gray-100 px-3 py-2 rounded-md border w-full max-w-md focus:outline-none focus:ring-2 focus:ring-primary"
+                value={profileData.address}
+                onChange={(e) =>
+                  setProfileData((prev) => ({ ...prev, address: e.target.value }))
+                }
+              />
+            ) : (
+              <p>{profileData.address}</p>
+            )}
           </div>
         </div>
+      </section>
+
+      <hr className="my-6 border-gray-300" />
+
+
+   <section>
+        <p className="text-primary font-semibold mb-2">Basic Information</p>
+        <div className="grid gap-4 text-gray-700">
+
+<div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+            <label className="font-medium w-28">Speciality:</label>
+            {isEdit ? (
+              <select
+                className="bg-gray-100 px-3 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-primary max-w-[160px]"
+                onChange={(e) =>
+                  setProfileData((prev) => ({ ...prev, speciality: e.target.value }))
+                }
+                value={profileData.speciality}
+              >
+                
+                <option value="General physician">General physician</option>
+                <option value="Gynecologist">Gynecologist</option>
+                <option value="Dermatologist">Dermatologist</option>
+                <option value="Pediatricians">Pediatricians</option>
+                <option value="Neurologist">Neurologist</option>
+                <option value="Gastroenterologist">Gastroenterologist</option>
+                
+              </select>
+            ) : (
+              <p>{profileData.speciality}</p>
+            )}
+          </div>
+
+<div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+            <label className="font-medium w-28">Experience:</label>
+            {isEdit ? (
+              <input
+                type="number"
+                className="bg-gray-100 px-3 py-2 rounded-md border w-full max-w-md focus:outline-none focus:ring-2 focus:ring-primary"
+                value={profileData.experience}
+                onChange={(e) =>
+                  setProfileData((prev) => ({ ...prev, experience: e.target.value }))
+                }
+              />
+            ) : (
+              <p>{profileData.experience}{" Years "}</p>
+            )}
+          </div>
+
+
+<div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+            <label className="font-medium w-28">Degree:</label>
+            {isEdit ? (
+              <input
+                type="text"
+                className="bg-gray-100 px-3 py-2 rounded-md border w-full max-w-md focus:outline-none focus:ring-2 focus:ring-primary"
+                value={profileData.degree}
+                onChange={(e) =>
+                  setProfileData((prev) => ({ ...prev, degree: e.target.value }))
+                }
+              />
+            ) : (
+              <p>{profileData.degree}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+            <label className="font-medium w-28">About:</label>
+            {isEdit ? (
+              <textarea
+                rows={4}
+                className="bg-gray-100 px-3 py-2 rounded-md border w-full max-w-md focus:outline-none focus:ring-2 focus:ring-primary"
+                value={profileData.about}
+                onChange={(e) =>
+                  setProfileData((prev) => ({ ...prev, about: e.target.value }))
+                }
+              />
+            ) : (
+              <p>{profileData.about}</p>
+            )}
+          </div>
+
+<div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+            <label className="font-medium w-28">Fee:</label>
+            {isEdit ? (
+              // <input
+              //   type="number"
+              //   className="bg-gray-100 px-3 py-2 rounded-md border w-full max-w-md focus:outline-none focus:ring-2 focus:ring-primary"
+          
+              //   onChange={(e) =>
+              //     setProfileData((prev) => ({ ...prev, fees: e.target.value }))
+              //   }
+              // />
+
+
+              <input
+  type="text"
+  className="bg-gray-100 px-3 py-2 rounded-md border w-full max-w-md focus:outline-none focus:ring-2 focus:ring-primary"
+ 
+  onChange={(e) => {
+    const input = e.target.value;
+
+    // Chỉ cho phép chuỗi rỗng hoặc số không âm (dùng regex kiểm tra)
+    if (input === '' || /^\d+$/.test(input)) {
+      setProfileData((prev) => ({ ...prev, fees: input }));
+    } else {
+      toast.warning('Only non-negative numbers are allowed');
+    }
+  }}
+/>
+
+            ) : (
+              <p>{formatVND(profileData.schedule[0].fees,'')}{" VNĐ"}</p>
+            )}
+          </div>
+
+
+          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+            <label className="font-medium w-28">Available:</label>
+            {isEdit ? (
+              <select
+                className="bg-gray-100 px-3 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-primary max-w-[160px]"
+                onChange={(e) =>
+                  setProfileData((prev) => ({ ...prev, available: e.target.value }))
+                }
+                value={profileData.available}
+              >
+                <option value="true">Available</option>
+                <option value="false">Unavailable</option>
+              </select>
+            ) : (
+              <select
+              disabled
+              value={profileData.available}
+                className="bg-gray-100 px-3 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-primary max-w-[160px]"
+              
+              >
+          
+                <option  value="true">Available</option>
+                <option value="false">Unavailable</option>
+              </select>
+            )}
+          </div>
+             <div className="mt-8 flex justify-center">
+        {isEdit ? (
+          <button
+            onClick={updateProfile}
+            disabled={loading}
+            className="bg-primary text-white px-6 py-2 rounded-full hover:bg-primary-dark transition-all flex items-center gap-2 disabled:opacity-50"
+          >
+            {loading && (
+              <span className="animate-spin h-4 w-4 border-2 border-t-transparent border-white rounded-full"></span>
+            )}
+            {loading ? 'Saving...' : 'Save Changes'}
+          </button>
+        ) : (
+          <button
+            onClick={() => setIsEdit(true)}
+            className="border border-primary text-primary px-6 py-2 rounded-full hover:bg-primary hover:text-white transition-all"
+          >
+            Edit Profile
+          </button>
+        )}
+      </div>
+        </div>
+      </section>
+
       </div>
     )
+    
   );
 };
 

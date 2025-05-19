@@ -15,6 +15,7 @@ import doctor_admin_icon from './doctor_admin_icon.svg'
 import profile from './profile.svg'
 import prescription from './prescription.svg'
 import schedule from './schedule.svg'
+import receipt from './receipt.svg'
 export const assets = {
     add_icon,
     admin_logo,
@@ -32,5 +33,6 @@ export const assets = {
     doctor_admin_icon,
     profile,
     prescription,
-    schedule
+    schedule,
+    receipt
 }

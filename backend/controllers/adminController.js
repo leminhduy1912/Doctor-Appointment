@@ -8,6 +8,7 @@ import { sendActivateFromAdminToDoctor, sendActivateFromAdminToPatient, sendConf
 import userModel from '../models/user.model.js'
 import mongoose from 'mongoose'
 import streamifier from 'streamifier';
+import paymentModel from '../models/payment.model.js'
 
 // API for admin login
 const loginAdmin = async (req, res) => {
@@ -199,105 +200,8 @@ const formattedAddress = address; // không cần parse
     }
 };
 
-// const addDoctor = async (req, res) => {
-//     try {
-//         const {
-//             image, name, email, password, speciality,
-//             degree, experience, about,
-//             address, phoneNumber
-//         } = req.body;
-
-//         console.log("Adding doctor:", name);
-
-//         // Kiểm tra thiếu trường
-//         if (!name || !email || !password || !speciality || !degree || !experience || !about  || !address || !phoneNumber) {
-//             return res.status(400).json({ success: false, message: "Missing Details" });
-//         }
-
-//         // Kiểm tra email
-//         if (!validator.isEmail(email)) {
-//             return res.status(400).json({ success: false, message: "Please enter a valid email" });
-//         }
-
-//         const existingUser = await doctorModel.findOne({ email });
-//         if (existingUser) {
-//             return res.status(400).json({ success: false, message: "Email already in use" });
-//         }
-
-//         if (password.length < 8) {
-//             return res.status(400).json({ success: false, message: "Please enter a strong password" });
-//         }
-
-//         const salt = await bcrypt.genSalt(10);
-//         const hashedPassword = await bcrypt.hash(password, salt);
-
-//         // Upload image nếu là base64 hoặc file path
-//         let imageUrl = '';
-//         if (image) {
-//             const uploadRes = await cloudinary.uploader.upload(image);
-//             imageUrl = uploadRes.secure_url;
-//         }
-
-//         // Parse address nếu là chuỗi JSON
-//         const formattedAddress = typeof address === 'string' ? JSON.parse(address) : address;
-
-//         // Parse schedule nếu là chuỗi JSON
-//         const formattedSchedule = typeof schedule === 'string' ? JSON.parse(schedule) : schedule;
-
-//         // Tạo đối tượng bác sĩ mới
-//         const newDoctor = new doctorModel({
-//             name,
-//             email,
-//             phoneNumber,
-//             password: hashedPassword,
-//             speciality,
-//             degree,
-//             experience,
-//             about,
-//             address: formattedAddress,
-//             image: imageUrl,
-//             patients: [],
-//             createdAt: new Date(),
-//             updatedAt: new Date()
-//         });
-
-//         await newDoctor.save();
-
-//         return res.status(201).json({
-//             success: true,
-//             message: "Doctor added successfully",
-//             doctor: newDoctor
-//         });
-
-//     } catch (error) {
-//         console.error("Error adding doctor:", error);
-//         res.status(500).json({ success: false, message: "Internal Server Error" });
-//     }
-// };
 
 
-// API to get dashboard data for admin panel
-const adminDashboard = async (req, res) => {
-    try {
-
-        const doctors = await doctorModel.find({})
-        const users = await userModel.find({})
-        const appointments = await appointmentModel.find({})
-
-        const dashData = {
-            doctors: doctors.length,
-            appointments: appointments.length,
-            patients: users.length,
-            latestAppointments: appointments.reverse()
-        }
-
-        res.json({ success: true, dashData })
-
-    } catch (error) {
-        console.log(error)
-        res.json({ success: false, message: error.message })
-    }
-}
 
 const updateStatusDoctor = async (req, res) => {
     try {
@@ -426,13 +330,96 @@ const appointmentCancel = async (req, res) => {
       return res.status(500).json({ success: false, message: "Internal Server Error" });
     }
   };
+
+
+export const getAllPayments = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1; // Mặc định trang 1
+    const limit = parseInt(req.query.limit) || 10; // Mặc định 10 bản ghi mỗi trang
+    const skip = (page - 1) * limit;
+
+    const payments = await paymentModel.aggregate([
+      {
+        $lookup: {
+          from: "doctors",
+          let: { slotId: "$slotId" },
+          pipeline: [
+            { $unwind: "$schedule" },
+            {
+              $match: {
+                $expr: { $eq: ["$schedule._id", "$$slotId"] }
+              }
+            },
+            {
+              $project: {
+                name: 1,
+                speciality: 1,
+                phoneNumber: 1,
+                "schedule.day": 1,
+                "schedule.date": 1,
+                "schedule.startTime": 1,
+                "schedule.endTime": 1,
+                "schedule.fees": 1
+              }
+            }
+          ],
+          as: "doctorInfo"
+        }
+      },
+      { $unwind: "$doctorInfo" },
+      {
+        $addFields: {
+          doctor: {
+            name: "$doctorInfo.name",
+            speciality: "$doctorInfo.speciality",
+            phoneNumber: "$doctorInfo.phoneNumber",
+            slot: "$doctorInfo.schedule"
+          }
+        }
+      },
+      {
+        $project: {
+          slotId: 1,
+          amount: 1,
+          paymentMethod: 1,
+          status: 1,
+          date: 1,
+          invoiceNumber: 1,
+          doctor: 1
+        }
+      },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit }
+    ]);
+
+    // Đếm tổng số kết quả (bỏ phân trang)
+    const total = await paymentModel.countDocuments();
+
+    res.status(200).json({
+      success: true,
+      data: payments,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
+  } catch (err) {
+    console.error("Failed to fetch payments with doctor info:", err);
+    res.status(500).json({ success: false, message: "Failed to fetch payments" });
+  }
+};
+
+
 export {
     loginAdmin,
     appointmentsAdmin,
     appointmentCancel,
     addDoctor,
     getDoctorList,
-    adminDashboard,
+    
     updateStatusDoctor,
     getUserList,
     updateStatusPatient

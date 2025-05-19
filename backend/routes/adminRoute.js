@@ -1,5 +1,5 @@
 import express from 'express'
-import { addDoctor, adminDashboard, appointmentCancel, appointmentsAdmin, getDoctorList, getUserList, loginAdmin, updateStatusDoctor, updateStatusPatient } from '../controllers/adminController.js'
+import { addDoctor, appointmentCancel, appointmentsAdmin, getAllPayments, getDoctorList, getUserList, loginAdmin, updateStatusDoctor, updateStatusPatient } from '../controllers/adminController.js'
 import authAdmin from '../middlewares/authAdmin.js'
 import { updateStatus } from '../controllers/doctorController.js'
 import { getAllAppointments } from '../controllers/appointmentController.js';
@@ -17,6 +17,5 @@ adminRouter.get("/all-patients", authAdmin, getUserList)
 
 adminRouter.post("/change-availability", authAdmin, updateStatusDoctor)
 adminRouter.post("/change-availability-patient", authAdmin, updateStatusPatient)
-adminRouter.get("/dashboard", authAdmin, adminDashboard)
-
+adminRouter.get("/payments",authAdmin,getAllPayments)
 export default adminRouter;

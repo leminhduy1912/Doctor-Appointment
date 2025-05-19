@@ -4,7 +4,8 @@ import jwt from "jsonwebtoken";
 import appointmentModel from "../models/appointment.model.js";
 import { sendConfirmationBookingAndPaymentRequestToUser, sendConfirmationCancelScheduleFromDoctorToUser, sendConfirmationScheduleToDoctor, sendConfirmationScheduleToUser } from "../config/mailer.js";
 import mongoose from "mongoose";
-
+import {v2 as cloudinary} from "cloudinary"
+import streamifier from 'streamifier';
 // API for doctor Login 
 const loginDoctor = async (req, res) => {
 
@@ -231,74 +232,8 @@ const appointmentCancel = async (req, res) => {
 
 
 
-// //complete appointment
-// const appointmentComplete = async (req, res) => {
-//     try {
-//         const { doctorId, appointmentId } = req.body;
-
-//         const appointmentData = await appointmentModel.findById(appointmentId);
-//         if (!appointmentData) {
-//             return res.json({ success: false, message: "Appointment not found" });
-//         }
-
-//         if (appointmentData.doctorId.toString() !== doctorId) {
-//             return res.json({ success: false, message: "Unauthorized: You can only complete your own appointments" });
-//         }
-
-//         await appointmentModel.findByIdAndUpdate(appointmentId, { status: "completed" });
-
-//         return res.json({ success: true, message: "Appointment Completed" });
-
-//     } catch (error) {
-//         console.error("Error completing appointment:", error);
-//         res.status(500).json({ success: false, message: "Internal Server Error" });
-//     }
-// };
-
-//get doctor list
-// const getDoctorList = async (req, res) => {
-//     try {
-//         const doctors = await doctorModel.find({}).select("-password");
-//         res.json({ success: true, doctors });
-//     } catch (error) {
-//         console.error("Error fetching doctors:", error);
-//         res.status(500).json({ success: false, message: "Internal Server Error" });
-//     }
-// };
 
 
-// const getDoctorList = async (req, res) => {
-//   try {
-//       const { speciality, page = 1, limit = 10 } = req.query;
-
-//       const filter = {};
-//       if (speciality) {
-//           filter.speciality = speciality;
-//       }
-
-//       const skip = (Number(page) - 1) * Number(limit);
-
-//       const doctors = await doctorModel
-//           .find(filter)
-//           .select("-password")
-//           .skip(skip)
-//           .limit(Number(limit))
-//           .sort({ createdAt: -1 }); // sắp xếp mới nhất trước
-
-//       const total = await doctorModel.countDocuments(filter);
-
-//       res.json({
-//           success: true,
-//           doctors,
-//           total,
-//           page: Number(page),
-//           totalPages: Math.ceil(total / limit),
-//       });
-//   } catch (error) {
-//       console.error("Error fetching doctors:", error);
-//       res.status(500).json({ success: false, message: "Internal Server Error" });
-//   }
-// };
 const getDoctorList = async (req, res) => {
   try {
     const { speciality, page = 1, limit = 10 } = req.query;
@@ -415,53 +350,89 @@ const getScheduleDoctorPagination = async (req, res) => {
 
 //update profile doctor
 const updateDoctorProfile = async (req, res) => {
-    try {
-        const { doctorId, fees, address, available } = req.body;
+  try {
+    const {
+      doctorId,
+      name,
+      speciality,
+      phoneNumber,
+      experience,
+      degree,
+      address,
+      available,
+      about,
+      fees, // ⬅️ thêm fees vào destructuring
+    } = req.body;
 
-        const doctor = await doctorModel.findByIdAndUpdate(doctorId, { fees, address, available }, { new: true });
+    console.log("req.body:", req.body);
+    console.log("req.file:", req.file);
 
-        if (!doctor) {
-            return res.json({ success: false, message: "Doctor not found" });
-        }
-
-        res.json({ success: true, message: "Profile Updated", doctor });
-
-    } catch (error) {
-        console.error("Error updating profile:", error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
+    // Tìm bác sĩ hiện tại
+    const doctor = await doctorModel.findById(doctorId);
+    if (!doctor) {
+      return res.status(404).json({ message: "Doctor not found" });
     }
-};
-//doctor dashboard
-const doctorDashboard = async (req, res) => {
-    try {
-        const { doctorId } = req.body;
 
-        const appointments = await appointmentModel.find({ doctorId });
+    // Tạo object các trường cần cập nhật
+    const updatedFields = {};
+    if (name) updatedFields.name = name;
+    if (speciality) updatedFields.speciality = speciality;
+    if (phoneNumber) updatedFields.phoneNumber = phoneNumber;
+    if (experience) updatedFields.experience = experience;
+    if (degree) updatedFields.degree = degree;
+    if (about) updatedFields.about = about;
+    if (available !== undefined) updatedFields.available = available;
+    if (address) updatedFields.address = address;
 
-        let earnings = 0;
-        let patients = new Set();
+    // Nếu có fees, cập nhật toàn bộ fees trong schedule
+    if (fees) {
+      doctor.schedule = doctor.schedule.map(slot => ({
+        ...slot,
+        fees: fees,
+      }));
+      updatedFields.schedule = doctor.schedule;
+    }
 
-        appointments.forEach((appointment) => {
-            if (appointment.status === "completed" && appointment.payment) {
-                earnings += appointment.amount || 0;
+    // Upload ảnh nếu có
+    if (req.file) {
+      const streamUpload = (buffer) => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "doctor-profiles" },
+            (error, result) => {
+              if (result) resolve(result);
+              else reject(error);
             }
-            patients.add(appointment.patientId.toString());
+          );
+          streamifier.createReadStream(buffer).pipe(stream);
         });
+      };
 
-        const dashData = {
-            earnings,
-            appointments: appointments.length,
-            patients: patients.size,
-            latestAppointments: appointments.reverse(),
-        };
-
-        res.json({ success: true, dashData });
-
-    } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
+      const result = await streamUpload(req.file.buffer);
+      updatedFields.image = result.secure_url;
     }
+
+    const updatedDoctor = await doctorModel.findByIdAndUpdate(
+      doctorId,
+      updatedFields,
+      { new: true }
+    );
+
+    if (!updatedDoctor) {
+      return res.status(404).json({ message: "Doctor not found after update" });
+    }
+
+    res.status(200).json({
+      message: "Doctor profile updated successfully",
+      doctor: updatedDoctor
+    });
+  } catch (error) {
+    console.error("Update doctor error:", error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
 };
+
+
 const updateSlotStatus = async (req, res) => {
     try {
       const { doctorId, slotId, newStatus, isConfirm } = req.body;
@@ -637,9 +608,9 @@ export {
     appointmentCancel,
     getDoctorList,
     updateStatus,
-    // appointmentComplete,
+
     getScheduleDoctorPagination,
-    doctorDashboard,
+ 
     getDoctorProfileById,
     updateDoctorProfile,
     getAppointmentsBySlotId,

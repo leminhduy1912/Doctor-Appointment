@@ -95,7 +95,7 @@ const getProfileById = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const { userId, name, phone, address, gender, dob } = req.body;
+    const { userId, name, phone, address, gender, dob,available } = req.body;
 
     console.log("req.body:", req.body); // Kiểm tra xem có đủ data không
     console.log("req.file:", req.file); // Kiểm tra xem có file không
@@ -105,6 +105,7 @@ const updateProfile = async (req, res) => {
     if (phone) updatedFields.phone = phone;
     if (gender) updatedFields.gender = gender;
     if (dob) updatedFields.dob = dob;
+    if (available) updatedFields.available = available;
     if (address) {
       try {
         updatedFields.address = JSON.parse(address); // nếu gửi object dạng JSON string

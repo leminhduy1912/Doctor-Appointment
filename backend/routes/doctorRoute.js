@@ -1,6 +1,7 @@
-import { appointmentCancel, appointmentsDoctor, getAppointmentsBySlotId, getDoctorList, getDoctorProfileById, getScheduleDoctorPagination, loginDoctor, updateDoctorSchedule, updateSlotStatus, updateStatus } from '../controllers/doctorController.js';
+import { appointmentCancel, appointmentsDoctor, getAppointmentsBySlotId, getDoctorList, getDoctorProfileById, getScheduleDoctorPagination, loginDoctor, updateDoctorProfile, updateDoctorSchedule, updateSlotStatus, updateStatus } from '../controllers/doctorController.js';
 import authDoctor from '../middlewares/authDoctor.js';
 import express from 'express';
+import upload from '../middlewares/multer.js';
 
 const doctorRouter = express.Router();
 
@@ -9,6 +10,7 @@ doctorRouter.post("/change-availability", authDoctor, updateStatus)
 doctorRouter.get("/list", getDoctorList)
 doctorRouter.get("/appointments", authDoctor, appointmentsDoctor)
 doctorRouter.get("/profile", authDoctor, getDoctorProfileById)
+doctorRouter.put("/profile", upload.single("image"),authDoctor, updateDoctorProfile)
 doctorRouter.post("/change-status-appointment", authDoctor, updateSlotStatus)
 doctorRouter.get("/get-appointment-by-slotId", authDoctor, getAppointmentsBySlotId)
 doctorRouter.post("/cancel-appointment",authDoctor,appointmentCancel)

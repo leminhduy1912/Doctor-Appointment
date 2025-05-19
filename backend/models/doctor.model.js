@@ -8,7 +8,7 @@ const doctorSchema = new mongoose.Schema({
     phoneNumber:String,
     experience: Number,
     degree: String,
-    address: { type: Object, required: true },
+    address: String,
     available: { type: Boolean, default: true },
     schedule: [{ day: String,date:String,fees:String, startTime: String, endTime: String, status: { type: String, default: "available" }}],
     rating: { type: Number, default: 0 },
