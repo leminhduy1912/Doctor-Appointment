@@ -75,6 +75,70 @@ const DoctorSchedule = () => {
       setLoading(false);
     }
   };
+
+
+
+// const handleAddSchedule = async () => {
+//   const { day, date, startTime, endTime } = newSlotData;
+
+//   if (!date || !startTime || !endTime) {
+//     toast.warning('Please fill in all fields');
+//     return;
+//   }
+
+//   const selectedDate = new Date(date);
+//   const today = new Date();
+//   today.setHours(0, 0, 0, 0);
+//   selectedDate.setHours(0, 0, 0, 0);
+
+//   if (selectedDate < today) {
+//     toast.warning('Date cannot be in the past');
+//     return;
+//   }
+
+//   if (startTime >= endTime) {
+//     toast.warning('Start time must be earlier than end time');
+//     return;
+//   }
+
+//   // ✅ Check nếu là ngày hôm nay thì startTime phải > thời gian hiện tại
+//   const now = new Date();
+//   if (selectedDate.getTime() === today.getTime()) {
+//     const [startHour, startMinute] = startTime.split(':').map(Number);
+//     const startDateTime = new Date();
+//     startDateTime.setHours(startHour, startMinute, 0, 0);
+
+//     if (startDateTime <= now) {
+//       toast.warning('Start time must be later than current time');
+//       return;
+//     }
+//   }
+
+//   setLoading(true);
+//   try {
+//     const id = localStorage.getItem('id');
+//     const dToken = localStorage.getItem('dToken');
+//     const payload = {
+//       doctorId: id,
+//       day,
+//       date,
+//       newSlot: { startTime, endTime },
+//       actionType: 'add',
+//     };
+//     await axios.post(`${backendUrl}/api/doctor/update-schedule`, payload, {
+//       headers: { dToken },
+//     });
+//     toast.success('New schedule added');
+//     setIsAddModalOpen(false);
+//     setNewSlotData({ day: '', date: '', startTime: '', endTime: '' });
+//     fetchSchedule();
+//   } catch (err) {
+//     //console.log(err.response.data.message)
+//     toast.warning(err.response.data.message);
+//   } finally {
+//     setLoading(false);
+//   }
+// };
 const handleAddSchedule = async () => {
   const { day, date, startTime, endTime } = newSlotData;
 
@@ -98,7 +162,7 @@ const handleAddSchedule = async () => {
     return;
   }
 
-  // ✅ Check nếu là ngày hôm nay thì startTime phải > thời gian hiện tại
+  // ✅ Nếu là hôm nay thì startTime phải > giờ hiện tại
   const now = new Date();
   if (selectedDate.getTime() === today.getTime()) {
     const [startHour, startMinute] = startTime.split(':').map(Number);
@@ -111,6 +175,9 @@ const handleAddSchedule = async () => {
     }
   }
 
+  // ✅ Format lại date sang dd-mm-yyyy
+  const formattedDate = formatDateToDDMMYYYY(date);
+
   setLoading(true);
   try {
     const id = localStorage.getItem('id');
@@ -118,7 +185,7 @@ const handleAddSchedule = async () => {
     const payload = {
       doctorId: id,
       day,
-      date,
+      date: formattedDate,
       newSlot: { startTime, endTime },
       actionType: 'add',
     };
@@ -130,11 +197,19 @@ const handleAddSchedule = async () => {
     setNewSlotData({ day: '', date: '', startTime: '', endTime: '' });
     fetchSchedule();
   } catch (err) {
-    //console.log(err.response.data.message)
     toast.warning(err.response.data.message);
   } finally {
     setLoading(false);
   }
+};
+
+// ✅ Hàm định dạng ngày thành dd-mm-yyyy
+const formatDateToDDMMYYYY = (isoDate) => {
+  const d = new Date(isoDate);
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${day}-${month}-${year}`;
 };
 
 

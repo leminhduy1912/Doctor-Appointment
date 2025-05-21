@@ -383,15 +383,8 @@ const updateDoctorProfile = async (req, res) => {
     if (about) updatedFields.about = about;
     if (available !== undefined) updatedFields.available = available;
     if (address) updatedFields.address = address;
-
-    // Nếu có fees, cập nhật toàn bộ fees trong schedule
-    if (fees) {
-      doctor.schedule = doctor.schedule.map(slot => ({
-        ...slot,
-        fees: fees,
-      }));
-      updatedFields.schedule = doctor.schedule;
-    }
+if (fees) updatedFields.fees = fees
+    
 
     // Upload ảnh nếu có
     if (req.file) {
@@ -501,7 +494,7 @@ const updateSlotStatus = async (req, res) => {
   
 const updateDoctorSchedule = async (req, res) => {
   try {
-    const { doctorId, day, date, newSlot, actionType, fees = "50000" } = req.body;
+    const { doctorId, day, date, newSlot, actionType } = req.body;
 
     const doctor = await doctorModel.findById(doctorId);
     if (!doctor) {
@@ -541,7 +534,6 @@ const updateDoctorSchedule = async (req, res) => {
         date,
         startTime: newSlot.startTime,
         endTime: newSlot.endTime,
-        fees,
         status: 'available'
       };
 

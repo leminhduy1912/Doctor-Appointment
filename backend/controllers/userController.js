@@ -233,7 +233,7 @@ const isUserExist = async (req, res) => {
           email:doctor.email,
           image: doctor.image
         },
-        amount: slot.fees,
+        amount: doctor.fees,
         slotTime: `${slot.startTime} - ${slot.endTime}`,
         slotDate: slot.date,
         date: Date.now()
@@ -250,7 +250,38 @@ const isUserExist = async (req, res) => {
     }
   };
   
+const getDoctorList = async (req, res) => {
+    try {
+        const { speciality, page = 1, limit = 10 } = req.query;
 
+        const filter = {};
+        if (speciality && speciality !== "All") {
+            filter.speciality = speciality;
+        }
+
+        const skip = (Number(page) - 1) * Number(limit);
+
+        const doctors = await doctorModel
+            .find(filter)
+            .select("-password")
+            .skip(skip)
+            .limit(Number(limit))
+            .sort({ createdAt: -1 });
+
+        const total = await doctorModel.countDocuments(filter);
+
+        res.json({
+            success: true,
+            doctors,
+            total,
+            page: Number(page),
+            totalPages: Math.ceil(total / limit),
+        });
+    } catch (error) {
+        console.error("Error fetching doctors:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+};
   
 
 
@@ -542,6 +573,25 @@ const getAllAppointments = async (req, res) => {
           res.status(500).json({ success: false, message: "Internal Server Error" });
         }
       };
+
+
+      const getDoctorProfileById = async (req, res) => {
+          try {
+              const { docId } = req.body;
+              console.log("doctor Id",docId)
+              const profileData = await doctorModel.findById(docId).select("-password");
+      
+              if (!profileData) {
+                  return res.json({ success: false, message: "Doctor not found" });
+              }
+      
+              res.json({ success: true, profileData });
+      
+          } catch (error) {
+              console.error("Error fetching profile:", error);
+              res.status(500).json({ success: false, message: "Internal Server Error" });
+          }
+      };
 export {
     loginUser,
     registerUser,
@@ -552,5 +602,7 @@ export {
     getAllAppointments,
     updateSlotStatus,
     sendBookingConfirmToUserAndDoctor,
-    appointmentCancel
+    appointmentCancel,
+    getDoctorList,
+    getDoctorProfileById
 }

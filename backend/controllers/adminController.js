@@ -122,13 +122,13 @@ const addDoctor = async (req, res) => {
         const {
             name, email, password, speciality,
             degree, experience, about,
-            address, phoneNumber
+            address, phoneNumber,fees
         } = req.body;
 
         console.log("Adding doctor:", req.body);
 
         // Kiểm tra thiếu trường
-        if (!name || !email || !password || !speciality || !degree || !experience || !about || !address || !phoneNumber) {
+        if (!name || !email || !password || !speciality || !degree || !experience || !about || !address || !phoneNumber||!fees) {
             return res.status(400).json({ success: false, message: "Missing Details" });
         }
 
@@ -181,7 +181,8 @@ const formattedAddress = address; // không cần parse
             about,
             address: formattedAddress,
             image: imageUrl,
-            patients: [],
+    
+            fees:fees,
             createdAt: new Date(),
             updatedAt: new Date()
         });

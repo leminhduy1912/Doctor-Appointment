@@ -9,12 +9,13 @@ const doctorSchema = new mongoose.Schema({
     experience: Number,
     degree: String,
     address: String,
+    fees:String,
     available: { type: Boolean, default: true },
-    schedule: [{ day: String,date:String,fees:String, startTime: String, endTime: String, status: { type: String, default: "available" }}],
+    schedule: [{ day: String,date:String, startTime: String, endTime: String, status: { type: String, default: "available" }}],
     rating: { type: Number, default: 0 },
     image: { type: String, default: 'https://res.cloudinary.com/dolaccvrd/image/upload/v1744611708/v8i0ktcadocx6khckgp1.jpg' },
 about: String,
-    patients: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }] 
+
 }, { timestamps: true });
 
 const doctorModel = mongoose.models.Doctor || mongoose.model("Doctor", doctorSchema);

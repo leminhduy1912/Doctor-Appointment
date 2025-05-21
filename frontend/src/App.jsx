@@ -15,6 +15,7 @@ import Appointment from './pages/Appointment'
 import MyAppointments from './pages/MyAppointment'
 import ThankYou from './pages/ThankYou'
 import ForgotPassword from './pages/ForgotPassword'
+import SymptomSelector from './pages/RecommenDoctor'
 
 function App() {
 
@@ -35,7 +36,7 @@ function App() {
         <Route path='/my-appointments' element={<MyAppointments />} />
         <Route path='/thank-you' element={<ThankYou />} />
         <Route path='/forgot-pasword' element={<ForgotPassword />} />
- 
+      <Route path='/recommend-doctor' element={<SymptomSelector />} />
       </Routes>
       <Footer />
     </div>

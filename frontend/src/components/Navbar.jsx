@@ -109,6 +109,7 @@ const Navbar = () => {
           <NavLink to='/doctors'><li className='py-1'>ALL DOCTORS</li></NavLink>
           <NavLink to='/about'><li className='py-1'>ABOUT</li></NavLink>
           <NavLink to='/contact'><li className='py-1'>CONTACT</li></NavLink>
+          <NavLink to='/recommend-doctor'><li className='py-1'>RECOMMEND DOCTOR</li></NavLink>
         </ul>
 
         <div className='flex items-center gap-4 '>
