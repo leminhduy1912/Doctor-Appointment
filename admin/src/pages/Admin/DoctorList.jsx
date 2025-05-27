@@ -409,7 +409,8 @@ const DoctorList = () => {
         >
           <img
             className="bg-[#EAEFFF] group-hover:bg-primary transition-all duration-500 w-full h-32 object-cover"
-            src={item.image}
+            //src={item.image}
+            src="https://static.vecteezy.com/system/resources/previews/024/983/914/original/simple-user-default-icon-free-png.png"
             alt="Doctor"
           />
           <div className="p-4">

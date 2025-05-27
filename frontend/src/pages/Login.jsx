@@ -64,6 +64,55 @@ console.log(email);
     }
   }
 
+const handleForgotPassword = async () => {
+  if (!email) return toast.error('Please enter your email.')
+
+  try {
+    setIsLoading(true)
+
+    const { data } = await axios.post(`${backendUrl}/api/email/send-otp-reset-password`, { email })
+    console.log("data", data);
+
+    if (data.success) {
+      toast.success('OTP reset password sent to your email.')
+      setStep('otp-reset-password')
+    } 
+  } catch (err) {
+    console.log(error);
+    
+          toast.error('Email does not exist in our system.')
+
+  } finally {
+    setIsLoading(false)
+  }
+}
+
+
+
+
+const handleResetPassword = async () => {
+  if (!password) return toast.error('Please enter your new password.')
+
+  try {
+    setIsLoading(true)
+    const { data } = await axios.post(`${backendUrl}/api/user/reset-password`, {
+      email,
+      newPassword: password,
+    })
+
+    if (data.success) {
+      toast.success('Password updated successfully. Please login.')
+      setStep('login')
+    } else {
+      toast.error(data.message || 'Failed to reset password.')
+    }
+  } catch (err) {
+    toast.error('Error resetting password.')
+  } finally {
+    setIsLoading(false)
+  }
+}
+
   const handleVerifyOTP = async () => {
     if (!otp) return toast.error('Please enter the OTP.')
     try {
@@ -82,6 +131,27 @@ console.log(email);
       setIsLoading(false)
     }
   }
+
+  const handleVerifyOTPResetPassword = async () => {
+    if (!otp) return toast.error('Please enter the OTP.')
+    try {
+      setIsLoading(true)
+      const { data } = await axios.post(`${backendUrl}/api/email/verify-otp-reset-password`, { email, otp })
+
+      if (data.success) {
+        toast.success('OTP verified. Continue to registration.')
+        setStep('new-password')
+      } else {
+        toast.error('Invalid OTP.')
+      }
+    } catch (error) {
+      toast.error('Error verifying OTP.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+
 
   const handleRegister = async (e) => {
     e.preventDefault()
@@ -129,7 +199,7 @@ console.log(email);
       setIsLoading(false)
     }
   }
-
+console.log(step)
   return (
     <>
       {isLoading && <Loading />}
@@ -138,11 +208,18 @@ console.log(email);
         className='min-h-[80vh] flex items-center'
       >
         <div className='flex flex-col gap-3 m-auto items-start p-8 min-w-[340px] sm:min-w-96 border rounded-xl text-[#5E5E5E] text-sm shadow-lg'>
-          <p className='text-2xl font-semibold'>
-            {step === 'login' ? 'Login' : 'Sign Up'}
-          </p>
-          <p>{step === 'login' ? 'Access your account' : 'Register to book appointments'}</p>
+    <h2 className='text-xl font-semibold'>
+    {step === 'login' && 'Login'}
+        {step === 'email' && 'Enter email to register'}
 
+    {step === 'register' && 'Sign Up'}
+    {step === 'forgot-password-email' && 'Forgot Password'}
+    </h2>
+ <p>
+    {step === 'login' && 'Access your account'}
+    {step === 'register' && 'Register to book appointments'}
+    {step === 'forgot-password-email' && 'Reset your password'}
+  </p>
           {/* Step: Login */}
           {step === 'login' && (
             <>
@@ -151,7 +228,6 @@ console.log(email);
                 <input
                   type='email'
                   value={email}
-                  //onChange={(e) => setEmail(e.target.value)}
                   onChange={handleEmailChange}
                   className='border border-[#DADADA] rounded w-full p-2 mt-1'
                   required
@@ -172,13 +248,13 @@ console.log(email);
               </div>
                {/* Forgot Password link */}
     <div className='w-full text-right mt-1'>
-      <button
-        //onClick={handleForgotPassword}
-        className='text-sm text-blue-500 hover:underline hover:text-blue-600 transition duration-150'
-        type='button'
-      >
-        Forgot password?
-      </button>
+  <button
+  onClick={() => setStep('forgot-password-email')}
+  className='text-sm text-blue-500 hover:underline hover:text-blue-600 transition duration-150'
+  type='button'
+>
+  Forgot password?
+</button>
     </div>
               <div className='flex w-full gap-3'>
                 <button
@@ -247,7 +323,7 @@ console.log(email);
           {step === 'otp' && (
             <>
               <div className='w-full'>
-                <p>OTP (check your email)</p>
+                <p>OTP to register (check your email)</p>
                 <input
                   type='text'
                   value={otp}
@@ -274,6 +350,140 @@ console.log(email);
               </div>
             </>
           )}
+
+                    {/* Step: Enter OTP reset password */}
+          {step === 'otp-reset-password' && (
+            <>
+              <div className='w-full'>
+                <p>OTP to reset password (check your email)</p>
+                <input
+                  type='text'
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  className='border border-[#DADADA] rounded w-full p-2 mt-1'
+                  required
+                />
+              </div>
+              <div className='flex w-full gap-3'>
+                <button
+                  type='button'
+                  onClick={handleBackStep}
+                  className='bg-gray-300 text-black w-full py-2 mt-3 rounded-md text-base'
+                >
+                  Back
+                </button>
+                <button
+                  type='button'
+                  onClick={handleVerifyOTPResetPassword}
+                  className='bg-blue-500 text-white w-full py-2 mt-3 rounded-md text-base'
+                >
+                  Verify OTP
+                </button>
+              </div>
+            </>
+          )}
+
+{step === 'forgot-password-email' && (
+  <>
+    <div className='w-full'>
+      <p>Email</p>
+      <input
+        type='email'
+        value={email}
+        onChange={handleEmailChange}
+        className='border border-[#DADADA] rounded w-full p-2 mt-1'
+        required
+        placeholder='Enter your email to reset password'
+      />
+      {error && <p className='text-red-500 text-sm mt-1'>{error}</p>}
+    </div>
+    <div className='flex w-full gap-3'>
+      <button
+        type='button'
+        onClick={handleBackStep}
+        className='bg-gray-300 text-black w-full py-2 mt-3 rounded-md text-base'
+      >
+        Back
+      </button>
+      <button
+        type='button'
+        onClick={handleForgotPassword}
+        className='bg-blue-500 text-white w-full py-2 mt-3 rounded-md text-base'
+      >
+        Send OTP
+      </button>
+    </div>
+  </>
+)}
+
+
+{/* Step: OTP Reset Password */}
+{step === 'otp-reset-pass' && (
+  <>
+    <div className='w-full'>
+      <p>OTP (check your email)</p>
+      <input
+        type='text'
+        value={otp}
+        onChange={(e) => setOtp(e.target.value)}
+        className='border border-[#DADADA] rounded w-full p-2 mt-1'
+        required
+      />
+    </div>
+    <div className='flex w-full gap-3'>
+      <button
+        type='button'
+        onClick={handleBackStep}
+        className='bg-gray-300 text-black w-full py-2 mt-3 rounded-md text-base'
+      >
+        Back
+      </button>
+      <button
+        type='button'
+        onClick={handleVerifyOTPResetPassword}
+        className='bg-blue-500 text-white w-full py-2 mt-3 rounded-md text-base'
+      >
+        Verify OTP
+      </button>
+    </div>
+  </>
+)}
+
+
+{/* Step: New Password */}
+{step === 'new-password' && (
+  <>
+    <div className='w-full'>
+      <p>New Password</p>
+      <input
+        type='password'
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className='border border-[#DADADA] rounded w-full p-2 mt-1'
+        required
+        placeholder='Enter new password'
+      />
+    </div>
+    <div className='flex w-full gap-3'>
+      <button
+        type='button'
+        onClick={handleBackStep}
+        className='bg-gray-300 text-black w-full py-2 mt-3 rounded-md text-base'
+      >
+        Back
+      </button>
+      <button
+        type='button'
+        onClick={handleResetPassword}
+        className='bg-blue-500 text-white w-full py-2 mt-3 rounded-md text-base'
+      >
+        Reset Password
+      </button>
+    </div>
+  </>
+)}
+
+
 
           {/* Step: Final Registration */}
           {step === 'signup' && (

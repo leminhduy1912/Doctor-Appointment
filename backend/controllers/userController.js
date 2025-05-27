@@ -8,6 +8,7 @@ import appointmentModel from "../models/appointment.model.js";
 import { sendConfirmationBookingAndPaymentRequestToUser, sendConfirmationCancelScheduleFromUserToDoctor, sendConfirmationScheduleToDoctor, sendConfirmationScheduleToUser, sendNotiNewBookingToDoctor } from "../config/mailer.js";
 import mongoose from "mongoose";
 import streamifier from 'streamifier';
+import paymentModel from "../models/payment.model.js";
 
 // API to register user
 const registerUser = async (req, res) => {
@@ -592,6 +593,164 @@ const getAllAppointments = async (req, res) => {
               res.status(500).json({ success: false, message: "Internal Server Error" });
           }
       };
+
+
+const getPaymentsByUserId = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "Missing userId" });
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const payments = await paymentModel.aggregate([
+      // Convert slotId to string for comparison with appointment.slotId
+      {
+        $addFields: {
+          slotIdStr: { $toString: "$slotId" }
+        }
+      },
+      {
+        $lookup: {
+          from: "appointments",
+          localField: "slotIdStr",
+          foreignField: "slotId", // appointment.slotId is string
+          as: "appointmentInfo"
+        }
+      },
+      { $unwind: "$appointmentInfo" },
+      {
+        $match: {
+          "appointmentInfo.userId": new mongoose.Types.ObjectId(userId)
+        }
+      },
+      {
+        $lookup: {
+          from: "doctors",
+          let: { slotId: "$slotId" },
+          pipeline: [
+            { $unwind: "$schedule" },
+            {
+              $match: {
+                $expr: { $eq: ["$schedule._id", "$$slotId"] }
+              }
+            },
+            {
+              $project: {
+                name: 1,
+                speciality: 1,
+                phoneNumber: 1,
+                "schedule.day": 1,
+                "schedule.date": 1,
+                "schedule.startTime": 1,
+                "schedule.endTime": 1,
+                "schedule.fees": 1
+              }
+            }
+          ],
+          as: "doctorInfo"
+        }
+      },
+      { $unwind: "$doctorInfo" },
+      {
+        $addFields: {
+          doctor: {
+            name: "$doctorInfo.name",
+            speciality: "$doctorInfo.speciality",
+            phoneNumber: "$doctorInfo.phoneNumber",
+            slot: "$doctorInfo.schedule"
+          }
+        }
+      },
+      {
+        $project: {
+          slotId: 1,
+          amount: 1,
+          paymentMethod: 1,
+          status: 1,
+          date: 1,
+          invoiceNumber: 1,
+          doctor: 1
+        }
+      },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit }
+    ]);
+
+    // Count total
+    const totalResult = await paymentModel.aggregate([
+      {
+        $addFields: {
+          slotIdStr: { $toString: "$slotId" }
+        }
+      },
+      {
+        $lookup: {
+          from: "appointments",
+          localField: "slotIdStr",
+          foreignField: "slotId",
+          as: "appointmentInfo"
+        }
+      },
+      { $unwind: "$appointmentInfo" },
+      {
+        $match: {
+          "appointmentInfo.userId": new mongoose.Types.ObjectId(userId)
+        }
+      },
+      { $count: "total" }
+    ]);
+
+    const total = totalResult[0]?.total || 0;
+
+    res.status(200).json({
+      success: true,
+      data: payments,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
+
+  } catch (err) {
+    console.error("Failed to fetch user payments:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  const { email, newPassword } = req.body;
+
+  if (!email || !newPassword) {
+    return res.status(400).json({ message: "Email and new password are required." });
+  }
+
+  try {
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+
+    await user.save();
+
+    return res.status(200).json({success:true, message: "Password reset successfully." });
+  } catch (error) {
+    console.error("Reset password error:", error);
+    return res.status(500).json({ message: "Internal server error." });
+  }
+};
+
 export {
     loginUser,
     registerUser,
@@ -604,5 +763,7 @@ export {
     sendBookingConfirmToUserAndDoctor,
     appointmentCancel,
     getDoctorList,
-    getDoctorProfileById
+    getDoctorProfileById,
+    getPaymentsByUserId,
+    resetPassword
 }

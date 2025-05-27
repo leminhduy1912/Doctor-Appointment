@@ -6,6 +6,7 @@ import { sendConfirmationBookingAndPaymentRequestToUser, sendConfirmationCancelS
 import mongoose from "mongoose";
 import {v2 as cloudinary} from "cloudinary"
 import streamifier from 'streamifier';
+import paymentModel from "../models/payment.model.js";
 // API for doctor Login 
 const loginDoctor = async (req, res) => {
 
@@ -591,6 +592,94 @@ const updateDoctorSchedule = async (req, res) => {
   }
 };
 
+const getAllPayments = async (req, res) => {
+  try {
+    const { doctorId } = req.body;
+    if (!doctorId) {
+      return res.status(400).json({ success: false, message: "Missing doctorId in query" });
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const payments = await paymentModel.aggregate([
+      {
+        $lookup: {
+          from: "doctors",
+          let: { slotId: "$slotId" },
+          pipeline: [
+            { $unwind: "$schedule" },
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$schedule._id", "$$slotId"] },
+                    { $eq: ["$_id", new mongoose.Types.ObjectId(doctorId)] } // lọc theo doctorId
+                  ]
+                }
+              }
+            },
+            {
+              $project: {
+                name: 1,
+                speciality: 1,
+                phoneNumber: 1,
+                "schedule.day": 1,
+                "schedule.date": 1,
+                "schedule.startTime": 1,
+                "schedule.endTime": 1,
+                "schedule.fees": 1
+              }
+            }
+          ],
+          as: "doctorInfo"
+        }
+      },
+      { $unwind: "$doctorInfo" }, // chỉ lấy payment có doctor phù hợp
+      {
+        $addFields: {
+          doctor: {
+            name: "$doctorInfo.name",
+            speciality: "$doctorInfo.speciality",
+            phoneNumber: "$doctorInfo.phoneNumber",
+            slot: "$doctorInfo.schedule"
+          }
+        }
+      },
+      {
+        $project: {
+          slotId: 1,
+          amount: 1,
+          paymentMethod: 1,
+          status: 1,
+          date: 1,
+          invoiceNumber: 1,
+          doctor: 1
+        }
+      },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit }
+    ]);
+
+    const total = payments.length; // tổng sau khi lọc
+    res.status(200).json({
+      success: true,
+      data: payments,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
+  } catch (err) {
+    console.error("Failed to fetch payments for doctorId:", err);
+    res.status(500).json({ success: false, message: "Failed to fetch payments" });
+  }
+};
+
   
 
 export {
@@ -600,7 +689,7 @@ export {
     appointmentCancel,
     getDoctorList,
     updateStatus,
-
+getAllPayments,
     getScheduleDoctorPagination,
  
     getDoctorProfileById,

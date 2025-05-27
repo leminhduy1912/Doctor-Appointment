@@ -1,5 +1,5 @@
 import express from 'express'
-import { appointmentCancel, bookAppointment, getAllAppointments, getDoctorList, getDoctorProfileById, getProfileById, isUserExist, loginUser, registerUser, sendBookingConfirmToUserAndDoctor, updateProfile, updateSlotStatus } from '../controllers/userController.js';
+import { appointmentCancel, bookAppointment, getAllAppointments, getDoctorList, getDoctorProfileById, getPaymentsByUserId, getProfileById, isUserExist, loginUser, registerUser, resetPassword, sendBookingConfirmToUserAndDoctor, updateProfile, updateSlotStatus } from '../controllers/userController.js';
 import authUser from '../middlewares/authUser.js';
 import { findMedicalRecordByAppointmentId } from '../controllers/medicalRecordController.js';
 import upload from '../middlewares/multer.js';
@@ -18,6 +18,9 @@ userRouter.post("/send-booking-confirm-to-doctor-and-user",authUser,sendBookingC
 userRouter.post("/cancel-appointment",authUser,appointmentCancel)
 userRouter.get("/prescription/:appointmentId",authUser, findMedicalRecordByAppointmentId);
 userRouter.get("/all-doctors",authUser,getDoctorList)
+userRouter.get("/receipt",authUser,getPaymentsByUserId)
 userRouter.post("/doctor",getDoctorProfileById)
+userRouter.post("/reset-password",resetPassword)
+
 
 export default userRouter

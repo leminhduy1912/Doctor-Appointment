@@ -51,6 +51,10 @@ const Sidebar = () => {
           <img className='max-w-5' src={assets.prescription} alt='' />
           <p className='hidden md:block'>Prescription</p>
         </NavLink>
+       <NavLink to={'/receipts'} className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#F2F3FF] border-r-4 border-primary' : ''}`}>
+          <img className='max-w-6' src={assets.receipt} alt='' />
+          <p className='hidden md:block'>Receipt</p>
+        </NavLink>
   
         <NavLink to={'/doctor-profile'} className={({ isActive }) => `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${isActive ? 'bg-[#F2F3FF] border-r-4 border-primary' : ''}`}>
           <img className='max-w-5' src={assets.profile} alt='' />

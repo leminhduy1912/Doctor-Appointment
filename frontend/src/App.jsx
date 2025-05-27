@@ -16,6 +16,7 @@ import MyAppointments from './pages/MyAppointment'
 import ThankYou from './pages/ThankYou'
 import ForgotPassword from './pages/ForgotPassword'
 import SymptomSelector from './pages/RecommenDoctor'
+import UserReceipt from './pages/MyReceipt'
 
 function App() {
 
@@ -35,6 +36,7 @@ function App() {
         <Route path='/appointment/:docId' element={<Appointment />} />
         <Route path='/my-appointments' element={<MyAppointments />} />
         <Route path='/thank-you' element={<ThankYou />} />
+        <Route path='/receipts' element={<UserReceipt />} />
         <Route path='/forgot-pasword' element={<ForgotPassword />} />
       <Route path='/recommend-doctor' element={<SymptomSelector />} />
       </Routes>
