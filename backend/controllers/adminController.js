@@ -9,26 +9,63 @@ import userModel from '../models/user.model.js'
 import mongoose from 'mongoose'
 import streamifier from 'streamifier';
 import paymentModel from '../models/payment.model.js'
+import adminModel from '../models/admin.model.js'
 
-// API for admin login
+// // API for admin login
+// const loginAdmin = async (req, res) => {
+//     try {
+
+//         const { email, password } = req.body
+
+//         if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+//             const token = jwt.sign(email + password, process.env.JWT_SECRET)
+//             res.json({ success: true, token })
+//         } else {
+//             res.json({ success: false, message: "Invalid username or password !" })
+//         }
+
+//     } catch (error) {
+//         console.log(error)
+//         res.json({ success: false, message: error.message })
+//     }
+
+// }
+
 const loginAdmin = async (req, res) => {
-    try {
+  try {
+    const { email, password } = req.body;
 
-        const { email, password } = req.body
-
-        if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-            const token = jwt.sign(email + password, process.env.JWT_SECRET)
-            res.json({ success: true, token })
-        } else {
-            res.json({ success: false, message: "Invalid username or password !" })
-        }
-
-    } catch (error) {
-        console.log(error)
-        res.json({ success: false, message: error.message })
+    // 1. Kiểm tra đầu vào
+    if (!email || !password) {
+      return res.json({ success: false, message: "Missing email or password" });
     }
 
-}
+    // 2. Tìm admin theo email
+    const admin = await adminModel.findOne({ email });
+    if (!admin) {
+      return res.json({ success: false, message: "Invalid email or password" });
+    }
+
+    // 3. So khớp mật khẩu (mật khẩu trong DB phải được băm bằng bcrypt khi tạo admin)
+    const matched = await bcrypt.compare(password, admin.password);
+    if (!matched) {
+      return res.json({ success: false, message: "Invalid email or password" });
+    }
+
+    // 4. Tạo JWT token
+    //const token = jwt.sign(email + password, process.env.JWT_SECRET)
+  const token = jwt.sign(
+      { id: admin._id, role: "admin" },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+    // 5. Trả kết quả
+    return res.json({ success: true, token });
+  } catch (error) {
+    console.error("Login admin error:", error);
+    res.json({ success: false, message: error.message });
+  }
+};
 
 // API to get all appointments list
 const appointmentsAdmin = async (req, res) => {
@@ -44,7 +81,56 @@ const appointmentsAdmin = async (req, res) => {
 
 }
 
+export const createAdmin = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
 
+    // 1. Kiểm tra đầu vào
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields (name, email, password) are required.",
+      });
+    }
+
+    // 2. Kiểm tra email đã tồn tại chưa
+    const existingAdmin = await adminModel.findOne({ email });
+    if (existingAdmin) {
+      return res.status(409).json({
+        success: false,
+        message: "Email already exists.",
+      });
+    }
+
+    // 3. Băm mật khẩu
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // 4. Tạo admin mới
+    const newAdmin = await adminModel.create({
+      name,
+      email,
+      password: hashedPassword,
+    });
+
+    // 5. Phản hồi thành công
+    res.status(201).json({
+      success: true,
+      message: "Admin created successfully.",
+      admin: {
+        id: newAdmin._id,
+        name: newAdmin.name,
+        email: newAdmin.email,
+      },
+    });
+  } catch (error) {
+    console.error("Create admin error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error.",
+    });
+  }
+};
 
 // API to get all doctors list for admin panel
 const getDoctorList = async (req, res) => {
@@ -235,7 +321,6 @@ const updateStatusPatient = async (req, res) => {
         const { patientId,reason } = req.body;
 
         const patient = await userModel.findById(patientId).select("-password");
-        console.log("patientId",patientId)
         if (!patient) {
             return res.json({ success: false, message: "Patient not found" });
         }

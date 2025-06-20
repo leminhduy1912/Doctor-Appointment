@@ -17,7 +17,7 @@ userRouter.post("/change-status-appointment",authUser,updateSlotStatus)
 userRouter.post("/send-booking-confirm-to-doctor-and-user",authUser,sendBookingConfirmToUserAndDoctor)
 userRouter.post("/cancel-appointment",authUser,appointmentCancel)
 userRouter.get("/prescription/:appointmentId",authUser, findMedicalRecordByAppointmentId);
-userRouter.get("/all-doctors",authUser,getDoctorList)
+userRouter.get("/all-doctors",getDoctorList)
 userRouter.get("/receipt",authUser,getPaymentsByUserId)
 userRouter.post("/doctor",getDoctorProfileById)
 userRouter.post("/reset-password",resetPassword)

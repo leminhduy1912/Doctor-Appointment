@@ -23,7 +23,6 @@ function App() {
   return (
 <div className='mx-4 sm:mx-[10%]'>
       <ToastContainer />
-      {/* <Loading/> */}
       <Navbar />
       <Routes>
         <Route path='/' element={<Home />} />

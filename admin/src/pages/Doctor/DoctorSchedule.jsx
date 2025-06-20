@@ -192,18 +192,20 @@ const handleAddSchedule = async () => {
     await axios.post(`${backendUrl}/api/doctor/update-schedule`, payload, {
       headers: { dToken },
     });
+    
     toast.success('New schedule added');
-    setIsAddModalOpen(false);
+  setIsAddModalOpen(false)
     setNewSlotData({ day: '', date: '', startTime: '', endTime: '' });
     fetchSchedule();
   } catch (err) {
+
     toast.warning(err.response.data.message);
   } finally {
     setLoading(false);
   }
 };
 
-// ✅ Hàm định dạng ngày thành dd-mm-yyyy
+
 const formatDateToDDMMYYYY = (isoDate) => {
   const d = new Date(isoDate);
   const day = String(d.getDate()).padStart(2, '0');

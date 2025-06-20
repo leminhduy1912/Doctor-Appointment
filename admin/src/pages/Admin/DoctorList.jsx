@@ -284,7 +284,7 @@ const DoctorList = () => {
     const fetchDoctors = async () => {
       try {
         setLoading(true);
-        const { data } = await axios.get(`${backendUrl}/api/admin/all-doctors?page=${currentPage}&status=${filterStatus}`, {
+        const { data } = await axios.get(`${backendUrl}/api/admin/all-doctors?page=${currentPage}&speciality=${filterStatus}`, {
           headers: { aToken }
         });
 

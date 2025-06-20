@@ -345,7 +345,7 @@ console.log(profileData.available);
 />
 
             ) : (
-              <p>{formatVND(profileData.schedule[0].fees,'')}{" VNĐ"}</p>
+              <p>{formatVND(profileData.fees,'')}{" VNĐ"}</p>
             )}
           </div>
 
